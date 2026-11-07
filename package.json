@@ -1,0 +1,25 @@
+{
+  "name": "planet-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A visual snowy planet editor with spherical brushes and offline HTML export.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test",
+    "dev": "vite prototype --host 127.0.0.1",
+    "build": "vite build prototype --outDir ../dist",
+    "preview": "vite preview prototype --outDir ../dist --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@fontsource/sora": "^5.2.6",
+    "lucide": "^0.577.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "rolldown": "1.2.16",
+    "vite": "^8.3.6"
+  }
+}

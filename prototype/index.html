@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171b1a">
+  <title>Planet Studio · 星球画室</title>
+  <link rel="icon" href="data:,">
+  <script type="module" src="./studio/main.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="studio-brand" href="./" aria-label="Planet Studio 首页"><i data-lucide="orbit"></i><span>Planet <strong>Studio</strong></span></a>
+    <div class="project-heading">
+      <span class="top-divider"></span>
+      <input id="project-name" aria-label="星球名称" maxlength="80" value="未命名星球" spellcheck="false">
+      <span id="save-state" class="save-state">新作品</span>
+    </div>
+    <div class="top-actions">
+      <div class="history-actions">
+        <button class="icon-button" id="undo" aria-label="撤销" title="撤销" disabled><i data-lucide="undo-2"></i></button>
+        <button class="icon-button" id="redo" aria-label="重做" title="重做" disabled><i data-lucide="redo-2"></i></button>
+      </div>
+      <button class="icon-button" id="new-project" aria-label="新建星球" title="新建星球"><i data-lucide="file-plus-2"></i></button>
+      <button class="icon-button" id="import-project" aria-label="导入 JSON" title="导入 JSON"><i data-lucide="folder-open"></i></button>
+      <button class="icon-button" id="save-project" aria-label="保存 JSON" title="保存 JSON"><i data-lucide="save"></i></button>
+      <button class="primary-button" id="open-export"><i data-lucide="download"></i><span>导出</span></button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="toolpanel" aria-label="编辑工具">
+      <div class="panel-heading"><h1>星球画室</h1><span class="version">v0.1</span></div>
+      <fieldset class="tool-options">
+        <legend>工具</legend>
+        <button class="mode-button" data-mode="tree" aria-label="森林" aria-pressed="true"><span class="tool-symbol forest-symbol"><i data-lucide="trees"></i></span><span>森林</span><span class="material-dot forest-dot"></span></button>
+        <button class="mode-button" data-mode="house" aria-label="木屋" aria-pressed="false"><span class="tool-symbol house-symbol"><i data-lucide="house"></i></span><span>木屋</span><span class="material-dot house-dot"></span></button>
+        <button class="mode-button" data-mode="erase" aria-label="橡皮" aria-pressed="false"><span class="tool-symbol"><i data-lucide="eraser"></i></span><span>橡皮</span></button>
+        <button class="mode-button" data-mode="rotate" aria-label="旋转" aria-pressed="false"><span class="tool-symbol"><i data-lucide="rotate-3d"></i></span><span>旋转</span></button>
+      </fieldset>
+      <fieldset class="brush-options">
+        <legend>画笔</legend>
+        <label class="range-label" for="brush-radius"><span>范围</span><output id="radius-value">16°</output></label>
+        <input id="brush-radius" type="range" min="7" max="35" value="16">
+        <label class="range-label" for="brush-density"><span>密度</span><output id="density-value">65%</output></label>
+        <input id="brush-density" type="range" min="10" max="100" value="65" step="5">
+      </fieldset>
+      <fieldset class="environment-options">
+        <legend>场景</legend>
+        <div class="theme-row"><span class="snow-swatch"></span><span>雪原</span><i data-lucide="check"></i></div>
+        <label class="check-row"><span>飘雪</span><input id="snow-setting" type="checkbox" checked></label>
+        <label class="check-row"><span>自动旋转</span><input id="rotation-setting" type="checkbox" checked></label>
+      </fieldset>
+      <div class="composition">
+        <span>物件</span><span><output id="object-count">0</output><span class="object-limit"> / 2,000</span></span>
+        <div class="composition-meter"><span id="object-meter"></span></div>
+        <div class="composition-types"><span><i data-lucide="tree-pine"></i><output id="tree-count">0</output></span><span><i data-lucide="house"></i><output id="house-count">0</output></span></div>
+      </div>
+    </aside>
+
+    <section class="stage" id="stage" data-count="0" aria-label="星球画布">
+      <div class="stage-top">
+        <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span></div>
+        <div class="view-actions">
+          <button class="icon-button" id="pause-preview" aria-label="暂停动画" title="暂停动画" hidden><i data-lucide="pause"></i></button>
+          <button class="secondary-button" id="preview" aria-pressed="false"><i data-lucide="eye"></i><span id="preview-label">预览</span></button>
+        </div>
+      </div>
+      <canvas id="studio-canvas" tabindex="0" aria-label="三维星球画布"></canvas>
+      <div class="stage-loading" id="stage-loading"><span class="loading-line"></span></div>
+      <p class="scene-error" id="scene-error" role="alert" hidden></p>
+      <div class="stage-bottom"><span id="seed-label">SEED · 1727</span><span id="scene-detail">空白星球</span></div>
+    </section>
+  </main>
+  <footer class="statusbar"><span class="status-message" id="status" role="status" aria-live="polite">已就绪</span><span id="history-note">撤销历史 40 步</span></footer>
+  <input id="project-file" type="file" accept=".json,application/json" hidden>
+
+  <dialog id="replace-dialog" aria-labelledby="replace-title">
+    <div class="dialog-heading"><h2 id="replace-title">替换当前星球？</h2><button class="icon-button" data-close="replace-dialog" aria-label="取消替换"><i data-lucide="x"></i></button></div>
+    <p class="dialog-description">当前作品尚未导出 JSON。</p>
+    <div class="dialog-actions"><button class="secondary-button" id="save-before-replace"><i data-lucide="save"></i>先保存 JSON</button><button class="danger-button" id="confirm-replace">替换</button></div>
+  </dialog>
+
+  <dialog id="export-dialog" aria-labelledby="export-title">
+    <div class="dialog-heading"><h2 id="export-title">导出星球</h2><button class="icon-button" data-close="export-dialog" aria-label="关闭导出"><i data-lucide="x"></i></button></div>
+    <div class="export-file-row"><span class="file-symbol"><i data-lucide="file-code-2"></i></span><div><strong id="export-filename">my-planet.html</strong><span>独立 HTML</span></div><span id="export-object-count"></span></div>
+    <label class="field-label" for="embed-path">网页中的文件路径</label>
+    <input class="text-input" id="embed-path" value="/my-planet.html" maxlength="300" spellcheck="false">
+    <div class="code-label"><label class="field-label" for="embed-code">嵌入代码</label><button class="icon-button" id="copy-embed" aria-label="复制嵌入代码" title="复制嵌入代码"><i data-lucide="copy"></i></button></div>
+    <textarea id="embed-code" readonly aria-label="嵌入代码" rows="4" spellcheck="false"></textarea>
+    <div class="dialog-actions"><button class="primary-button" id="download-html"><i data-lucide="download"></i>下载 HTML</button></div>
+  </dialog>
+</body>
+</html>
