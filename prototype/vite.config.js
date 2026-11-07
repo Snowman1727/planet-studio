@@ -10,7 +10,8 @@ async function bundlePlayer() {
   try {
     const { output } = await bundle.generate({ format: 'iife', minify: true });
     const notice = await readFile(`${root}node_modules/three/LICENSE`, 'utf8');
-    return `/* Three.js license:\n${notice}\n*/\n${output.find((item) => item.type === 'chunk').code}`;
+    const projectNotice = await readFile(`${root}LICENSE`, 'utf8');
+    return `/* Planet Studio license:\n${projectNotice}\n\nThree.js license:\n${notice}\n*/\n${output.find((item) => item.type === 'chunk').code}`;
   } finally { await bundle.close(); }
 }
 
