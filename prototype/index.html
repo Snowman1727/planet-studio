@@ -33,10 +33,16 @@
       <div class="panel-heading"><h1>星球画室</h1><span class="version">v0.1</span></div>
       <fieldset class="tool-options">
         <legend>工具</legend>
+        <div class="tool-grid">
         <button class="mode-button" data-mode="tree" aria-label="森林" aria-pressed="true"><span class="tool-symbol forest-symbol"><i data-lucide="trees"></i></span><span>森林</span><span class="material-dot forest-dot"></span></button>
         <button class="mode-button" data-mode="house" aria-label="木屋" aria-pressed="false"><span class="tool-symbol house-symbol"><i data-lucide="house"></i></span><span>木屋</span><span class="material-dot house-dot"></span></button>
+        <button class="mode-button" data-mode="broadleaf" aria-label="阔叶树" aria-pressed="false"><span class="tool-symbol broadleaf-symbol"><i data-lucide="tree-deciduous"></i></span><span>阔叶树</span></button>
+        <button class="mode-button" data-mode="flowers" aria-label="花丛" aria-pressed="false"><span class="tool-symbol flowers-symbol"><i data-lucide="flower-2"></i></span><span>花丛</span></button>
+        <button class="mode-button" data-mode="rock" aria-label="岩石" aria-pressed="false"><span class="tool-symbol rock-symbol"><i data-lucide="mountain"></i></span><span>岩石</span></button>
+        <button class="mode-button" data-mode="mushroom" aria-label="蘑菇" aria-pressed="false"><span class="tool-symbol mushroom-symbol"><i data-lucide="umbrella"></i></span><span>蘑菇</span></button>
         <button class="mode-button" data-mode="erase" aria-label="橡皮" aria-pressed="false"><span class="tool-symbol"><i data-lucide="eraser"></i></span><span>橡皮</span></button>
         <button class="mode-button" data-mode="rotate" aria-label="旋转" aria-pressed="false"><span class="tool-symbol"><i data-lucide="rotate-3d"></i></span><span>旋转</span></button>
+        </div>
       </fieldset>
       <fieldset class="brush-options">
         <legend>画笔</legend>
@@ -46,21 +52,32 @@
         <input id="brush-density" type="range" min="10" max="100" value="65" step="5">
       </fieldset>
       <fieldset class="environment-options">
-        <legend>场景</legend>
-        <div class="theme-row"><span class="snow-swatch"></span><span>雪原</span><i data-lucide="check"></i></div>
-        <label class="check-row"><span>飘雪</span><input id="snow-setting" type="checkbox" checked></label>
+        <legend>环境</legend>
+        <div class="environment-switch">
+          <label class="environment-choice"><input type="radio" name="environment" value="snow" checked><span class="environment-swatch swatch-snow"></span><span>雪原</span></label>
+          <label class="environment-choice"><input type="radio" name="environment" value="grass"><span class="environment-swatch swatch-grass"></span><span>草地</span></label>
+          <label class="environment-choice"><input type="radio" name="environment" value="desert"><span class="environment-swatch swatch-desert"></span><span>沙漠</span></label>
+        </div>
+        <label class="check-row" id="snow-option"><span>飘雪</span><input id="snow-setting" type="checkbox" checked></label>
         <label class="check-row"><span>自动旋转</span><input id="rotation-setting" type="checkbox" checked></label>
       </fieldset>
       <div class="composition">
         <span>物件</span><span><output id="object-count">0</output><span class="object-limit"> / 2,000</span></span>
         <div class="composition-meter"><span id="object-meter"></span></div>
-        <div class="composition-types"><span><i data-lucide="tree-pine"></i><output id="tree-count">0</output></span><span><i data-lucide="house"></i><output id="house-count">0</output></span></div>
+        <div class="composition-types">
+          <span title="松林数量"><i data-lucide="tree-pine"></i><output id="tree-count" aria-label="松林数量">0</output></span>
+          <span title="木屋数量"><i data-lucide="house"></i><output id="house-count" aria-label="木屋数量">0</output></span>
+          <span title="阔叶树数量"><i data-lucide="tree-deciduous"></i><output id="broadleaf-count" aria-label="阔叶树数量">0</output></span>
+          <span title="花丛数量"><i data-lucide="flower-2"></i><output id="flowers-count" aria-label="花丛数量">0</output></span>
+          <span title="岩石数量"><i data-lucide="mountain"></i><output id="rock-count" aria-label="岩石数量">0</output></span>
+          <span title="蘑菇数量"><i data-lucide="umbrella"></i><output id="mushroom-count" aria-label="蘑菇数量">0</output></span>
+        </div>
       </div>
     </aside>
 
     <section class="stage" id="stage" data-count="0" aria-label="星球画布">
       <div class="stage-top">
-        <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span></div>
+        <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span><span class="scene-divider">/</span><span id="environment-label">雪原</span></div>
         <div class="view-actions">
           <button class="icon-button" id="pause-preview" aria-label="暂停动画" title="暂停动画" hidden><i data-lucide="pause"></i></button>
           <button class="secondary-button" id="preview" aria-pressed="false"><i data-lucide="eye"></i><span id="preview-label">预览</span></button>

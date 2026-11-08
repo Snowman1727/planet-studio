@@ -40,3 +40,16 @@ test('iframe path is escaped rather than creating new HTML attributes', () => {
   assert.ok(code.includes('x&quot; onload=&quot;alert(1)'));
   assert.ok(!code.includes('src="x" onload='));
 });
+
+test('HTML export retains the environment and exact poses of all six brushes', () => {
+  const project = createProject(42);
+  project.settings.environment = 'desert';
+  project.objects = ['tree', 'house', 'broadleaf', 'flowers', 'rock', 'mushroom'].map((type, i) => ({
+    id: `${type}:${i}`, type, direction: [0, 0, 1], scale: 1, heading: i,
+  }));
+  const html = buildHTML(project, 'globalThis.ready = true;');
+  const saved = JSON.parse(html.match(/<script id="planet-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+  assert.equal(saved.version, 2);
+  assert.equal(saved.settings.environment, 'desert');
+  assert.deepEqual(saved.objects, project.objects);
+});

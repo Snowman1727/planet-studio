@@ -1,11 +1,12 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, Check, TreePine, Eye, Pause, Play, X, FileCode2, Copy } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES } from './model.js';
 import { createScene } from './scene.js';
 import { buildHTML, embedCode, safeFilename } from './export.js';
+import { BRUSHES, ENVIRONMENTS } from './catalog.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, Check, TreePine, Eye, Pause, Play, X, FileCode2, Copy } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -44,7 +45,7 @@ function renderError(error) {
   $('scene-error').hidden = false;
   $('scene-error').textContent = error.message || '此浏览器无法显示三维星球。JSON 存档仍可保存。';
   $('stage-loading').hidden = true;
-  document.querySelectorAll('[data-mode]').forEach((button) => { button.disabled = true; });
+  document.querySelectorAll('button[data-mode]').forEach((button) => { button.disabled = true; });
   $('preview').disabled = true;
   announce('三维画面不可用，仍可保存 JSON。', true);
 }
@@ -53,8 +54,12 @@ function refresh({ fields = false } = {}) {
   scene?.sync(doc);
   stage.dataset.count = String(doc.objects.length);
   $('object-count').textContent = String(doc.objects.length);
-  $('tree-count').textContent = String(doc.objects.filter((o) => o.type === 'tree').length);
-  $('house-count').textContent = String(doc.objects.filter((o) => o.type === 'house').length);
+  for (const type of Object.keys(BRUSHES)) {
+    $(`${type}-count`).textContent = String(doc.objects.filter((o) => o.type === type).length);
+  }
+  $('environment-label').textContent = ENVIRONMENTS[doc.settings.environment].label;
+  $('snow-option').hidden = doc.settings.environment !== 'snow';
+  $('snow-setting').disabled = doc.settings.environment !== 'snow';
   $('object-meter').style.width = `${doc.objects.length / MAX_OBJECTS * 100}%`;
   $('scene-detail').textContent = doc.objects.length ? `${doc.objects.length} 个物件` : '空白星球';
   $('seed-label').textContent = `SEED · ${doc.seed}`;
@@ -64,6 +69,9 @@ function refresh({ fields = false } = {}) {
     $('project-name').value = doc.name;
     $('snow-setting').checked = doc.settings.snow;
     $('rotation-setting').checked = doc.settings.autoRotate;
+    document.querySelectorAll('[name="environment"]').forEach((input) => {
+      input.checked = input.value === doc.settings.environment;
+    });
   }
 }
 function flushRecovery() {
@@ -107,18 +115,26 @@ function setMode(value) {
   cancelStroke();
   mode = value;
   stage.dataset.mode = mode;
-  document.querySelectorAll('[data-mode]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.mode === mode)); });
+  document.querySelectorAll('button[data-mode]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.mode === mode)); });
   $('brush-density').disabled = mode === 'erase' || mode === 'rotate';
   $('brush-radius').disabled = mode === 'rotate';
   scene?.brush(null);
 }
-document.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
+document.querySelectorAll('button[data-mode]').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
 $('brush-radius').addEventListener('input', () => {
   cancelStroke();
   $('radius-value').value = `${$('brush-radius').value}°`;
   scene?.brush(null);
 });
 $('brush-density').addEventListener('input', () => { cancelStroke(); $('density-value').value = `${$('brush-density').value}%`; });
+document.querySelectorAll('[name="environment"]').forEach((input) => {
+  input.addEventListener('change', () => {
+    if (!input.checked) return;
+    cancelStroke();
+    store.project.settings.environment = input.value;
+    completeChange(`已切换为${ENVIRONMENTS[input.value].label}。`);
+  });
+});
 for (const [id, field] of [['snow-setting', 'snow'], ['rotation-setting', 'autoRotate']]) {
   $(id).addEventListener('change', () => { cancelStroke(); store.project.settings[field] = $(id).checked; completeChange('场景已更新。'); });
 }

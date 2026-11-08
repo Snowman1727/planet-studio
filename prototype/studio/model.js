@@ -10,8 +10,8 @@ const bounded = (value, min, max) => typeof value === 'number' && Number.isFinit
 
 export function createProject(seed = 1727) {
   return {
-    version: 1, generator: 1, name: '未命名星球', seed: seed >>> 0,
-    settings: { snow: true, autoRotate: true },
+    version: 2, generator: 1, name: '未命名星球', seed: seed >>> 0,
+    settings: { environment: 'snow', snow: true, autoRotate: true },
     view: { x: 0.12, y: -0.2 },
     objects: [],
   };
@@ -23,16 +23,19 @@ export function parseProject(text) {
   }
   let doc;
   try { doc = JSON.parse(text); } catch { fail(); }
-  if (!doc || doc.version !== 1 || doc.generator !== 1 ||
+  if (!doc || ![1, 2].includes(doc.version) || doc.generator !== 1 ||
       typeof doc.name !== 'string' || doc.name.length > 80 ||
       !Number.isInteger(doc.seed) || !bounded(doc.seed, 0, 4294967295) ||
       !Array.isArray(doc.objects) || doc.objects.length > MAX_OBJECTS ||
       typeof doc.settings?.snow !== 'boolean' || typeof doc.settings?.autoRotate !== 'boolean' ||
       !bounded(doc.view?.x, -1.5, 1.5) || !bounded(doc.view?.y, -100000, 100000)) fail();
+  const environment = doc.version === 1 ? 'snow' : doc.settings.environment;
+  if (typeof environment !== 'string' || !Object.hasOwn(ENVIRONMENTS, environment)) fail();
   const ids = new Set();
   const objects = doc.objects.map((object) => {
     if (!object || typeof object.id !== 'string' || !/^[\w:-]{1,64}$/.test(object.id) ||
-        ids.has(object.id) || !['tree', 'house'].includes(object.type) ||
+        ids.has(object.id) || typeof object.type !== 'string' || !Object.hasOwn(BRUSHES, object.type) ||
+        (doc.version === 1 && !['tree', 'house'].includes(object.type)) ||
         !Array.isArray(object.direction) || object.direction.length !== 3 ||
         !object.direction.every((n) => bounded(n, -1, 1)) ||
         Math.abs(Math.hypot(...object.direction) - 1) > 0.0001 ||
@@ -41,8 +44,8 @@ export function parseProject(text) {
     return { id: object.id, type: object.type, direction: [...object.direction], scale: object.scale, heading: object.heading };
   });
   return {
-    version: 1, generator: 1, name: doc.name, seed: doc.seed,
-    settings: { snow: doc.settings.snow, autoRotate: doc.settings.autoRotate },
+    version: 2, generator: 1, name: doc.name, seed: doc.seed,
+    settings: { environment, snow: doc.settings.snow, autoRotate: doc.settings.autoRotate },
     view: { x: doc.view.x, y: doc.view.y }, objects,
   };
 }
@@ -55,9 +58,10 @@ function hash(value) {
 }
 
 // Conservative angular bounds cover canopies/roof corners on the lowest land.
-const footprint = (object) => (object.type === 'tree' ? 0.06 : 0.115) * object.scale;
+const footprint = (object) => BRUSHES[object.type].footprint * object.scale;
+const maxFootprint = Math.max(...Object.values(BRUSHES).map((brush) => brush.footprint)) * 1.2;
 function candidates(seed, type) {
-  const count = type === 'tree' ? 14000 : 1800;
+  const count = BRUSHES[type].candidates;
   const phase = hash(seed + 73) * Math.PI * 2;
   return Array.from({ length: count }, (_, i) => {
     const y = 1 - 2 * (i + 0.5) / count;
@@ -86,7 +90,7 @@ class SpatialIndex {
   fits(object) {
     const [x, y, z] = this.coords(object.direction);
     const radius = footprint(object);
-    const reach = Math.ceil((radius + 0.138) / 0.16);
+    const reach = Math.ceil((radius + maxFootprint) / 0.16);
     for (let a = x - reach; a <= x + reach; a++) {
       for (let b = y - reach; b <= y + reach; b++) {
         for (let c = z - reach; c <= z + reach; c++) {
@@ -126,7 +130,7 @@ export function createStore(initial) {
     ids = new Set(project.objects.map((object) => object.id));
   }
   function resetCandidates() {
-    population = { tree: candidates(project.seed, 'tree'), house: candidates(project.seed, 'house') };
+    population = Object.fromEntries(Object.keys(BRUSHES).map((type) => [type, candidates(project.seed, type)]));
     rebuild();
   }
   resetCandidates();
@@ -167,7 +171,7 @@ export function createStore(initial) {
     get canUndo() { return past.length > 0; },
     get canRedo() { return future.length > 0; },
     begin(type, radius, density) {
-      if (!['tree', 'house', 'erase'].includes(type) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1)) {
+      if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1)) {
         throw new Error('画笔参数无效。');
       }
       cancel();
@@ -245,3 +249,4 @@ export function createStore(initial) {
     },
   };
 }
+import { BRUSHES, ENVIRONMENTS } from './catalog.js';

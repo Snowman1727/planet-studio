@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+import { BRUSHES, ENVIRONMENTS } from './catalog.js';
+import { createAssets } from './assets.js';
 
 const RADIUS = 2.08;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -21,6 +23,8 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   const noise = new ImprovedNoise();
   let doc = initial;
   let terrainSeed = doc.seed;
+  let environment = doc.settings.environment || 'snow';
+  let theme = ENVIRONMENTS[environment];
   let disposed = false;
   let visible = true;
   let presenting = false;
@@ -61,8 +65,8 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
     const raw = new THREE.IcosahedronGeometry(1, 20);
     const positions = raw.getAttribute('position');
     const colors = new Float32Array(positions.count * 3);
-    const base = new THREE.Color(0xe8f4f2);
-    const shade = new THREE.Color(0x9bb8bf);
+    const base = new THREE.Color(theme.land);
+    const shade = new THREE.Color(theme.shade);
     const tint = new THREE.Color();
     for (let i = 0; i < positions.count; i += 3) {
       normal.fromBufferAttribute(positions, i).normalize();
@@ -82,44 +86,18 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   }
   buildTerrain();
 
-  const material = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 0.9, ...extra });
-  const mats = {
-    bark: material(0x50433c), pine: material(0x245c4c), tip: material(0x387e60),
-    snow: material(0xeffaf6), wood: material(0x735a4b), roof: material(0xbd5c59),
-    window: material(0xf7c36c, { emissive: 0xe9a349, emissiveIntensity: 1.4 }),
-  };
-  function part(type, geometry, mat, position = [0, 0, 0], scale = [1, 1, 1]) {
-    const local = new THREE.Object3D();
-    local.position.fromArray(position);
-    local.scale.fromArray(scale);
-    local.updateMatrix();
-    return { type, geometry, mat, local: local.matrix.clone(), mesh: null };
+  const { parts, materials } = createAssets();
+  function applyEnvironment() {
+    theme = ENVIRONMENTS[environment];
+    ambient.color.setHex(theme.ambient);
+    ambient.groundColor.setHex(theme.groundLight);
+    light.color.setHex(theme.sunlight);
+    rim.color.setHex(theme.rim);
+    for (const name of ['pine', 'tip', 'leaf', 'leafTip', 'rock', 'petals', 'petalsAlt', 'mushroom']) {
+      materials[name].color.setHex(theme[name]);
+    }
   }
-  const parts = [
-    part('tree', new THREE.CylinderGeometry(0.018, 0.025, 0.2, 5), mats.bark, [0, 0.1, 0]),
-  ];
-  for (let i = 0; i < 3; i++) {
-    const scale = 1 - i * 0.22;
-    parts.push(part('tree', new THREE.ConeGeometry(0.115, 0.24, 6), i === 2 ? mats.tip : mats.pine, [0, 0.21 + i * 0.09, 0], [scale, scale, scale]));
-    parts.push(part('tree', new THREE.ConeGeometry(0.093, 0.185, 6), mats.snow, [0, 0.255 + i * 0.09, 0], [scale, scale, scale]));
-  }
-  const roofShape = new THREE.Shape();
-  roofShape.moveTo(-0.17, 0);
-  roofShape.lineTo(0, 0.15);
-  roofShape.lineTo(0.17, 0);
-  roofShape.closePath();
-  const roof = new THREE.ExtrudeGeometry(roofShape, { depth: 0.29, bevelEnabled: false });
-  parts.push(
-    part('house', new THREE.BoxGeometry(0.29, 0.2, 0.25), mats.wood, [0, 0.1, 0]),
-    part('house', roof, mats.roof, [0, 0.2, -0.145]),
-    part('house', roof, mats.snow, [0, 0.22, -0.145], [1.03, 0.94, 1.03]),
-    part('house', new THREE.BoxGeometry(0.06, 0.15, 0.06), mats.bark, [0.09, 0.32, -0.05]),
-    part('house', new THREE.BoxGeometry(0.08, 0.02, 0.08), mats.snow, [0.09, 0.4, -0.05]),
-    part('house', new THREE.BoxGeometry(0.06, 0.11, 0.012), mats.bark, [-0.065, 0.055, 0.13]),
-    part('house', new THREE.BoxGeometry(0.065, 0.06, 0.015), mats.window, [0.064, 0.13, 0.13]),
-    part('house', new THREE.BoxGeometry(0.006, 0.065, 0.018), mats.bark, [0.064, 0.13, 0.14]),
-    part('house', new THREE.BoxGeometry(0.07, 0.006, 0.018), mats.bark, [0.064, 0.13, 0.14]),
-  );
+  applyEnvironment();
   let capacity = 0;
   const objectTransform = new THREE.Object3D();
   const placed = new THREE.Matrix4();
@@ -135,7 +113,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
         world.add(p.mesh);
       }
     }
-    const counts = { tree: 0, house: 0 };
+    const counts = Object.fromEntries(Object.keys(BRUSHES).map((type) => [type, 0]));
     for (const object of doc.objects) {
       normal.fromArray(object.direction).normalize();
       objectTransform.position.copy(normal).multiplyScalar(height(normal) - 0.012);
@@ -152,6 +130,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
     for (const p of parts) {
       if (!p.mesh) continue;
       p.mesh.count = counts[p.type];
+      p.mesh.visible = !p.snow || environment === 'snow';
       p.mesh.instanceMatrix.needsUpdate = true;
       p.mesh.computeBoundingSphere();
     }
@@ -257,7 +236,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
     const easing = motion.matches ? 1 : 1 - Math.exp(-delta * 16);
     world.rotation.x += (target.x - world.rotation.x) * easing;
     world.rotation.y += (target.y - world.rotation.y) * easing;
-    snow.visible = doc.settings.snow && presenting && !motion.matches;
+    snow.visible = environment === 'snow' && doc.settings.snow && presenting && !motion.matches;
     stars.visible = presenting;
     renderer.render(scene, camera);
     dirty = false;
@@ -265,9 +244,12 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   return {
     sync(project) {
       const changedSeed = project.seed !== terrainSeed;
+      const changedEnvironment = project.settings.environment !== environment;
       doc = project;
       terrainSeed = project.seed;
-      if (changedSeed) buildTerrain();
+      environment = project.settings.environment || 'snow';
+      if (changedEnvironment) applyEnvironment();
+      if (changedSeed || changedEnvironment) buildTerrain();
       syncObjects();
     },
     setView(view) {

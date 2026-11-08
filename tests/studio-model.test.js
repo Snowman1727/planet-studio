@@ -120,7 +120,7 @@ test('poles and longitude seams can be painted without invalid positions', () =>
 test('invalid settings and over-limit documents are rejected', () => {
   const doc = createProject(42);
   for (const patch of [
-    { version: 2 }, { seed: NaN }, { name: {} },
+    { version: 3 }, { seed: NaN }, { name: {} },
     { objects: [fixture('same'), fixture('same')] },
     { objects: [{ ...fixture('x'), direction: [0, 0, 0] }] },
     { objects: [{ ...fixture('x'), direction: [2, 0, 0] }] },
@@ -175,4 +175,99 @@ test('spacing covers actual tree canopies and cabin roof corners, not just ancho
       assert.ok(separation >= aRadius + bRadius, `overlapping ${a.id} and ${b.id}`);
     }
   }
+});
+
+test('legacy projects migrate to snow without changing final poses', () => {
+  const legacy = {
+    version: 1, generator: 1, name: '旧星球', seed: 42,
+    settings: { snow: false, autoRotate: true },
+    view: { x: 0.12, y: -0.2 }, objects: [fixture('tree:12')],
+  };
+  const migrated = parseProject(JSON.stringify(legacy));
+  assert.equal(migrated.version, 2);
+  assert.deepEqual(migrated.settings, { environment: 'snow', snow: false, autoRotate: true });
+  assert.deepEqual(migrated.objects, legacy.objects);
+  assert.deepEqual(migrated.view, legacy.view);
+});
+
+test('new projects and all three environments survive exact saves', () => {
+  const project = createProject(42);
+  assert.equal(project.version, 2);
+  assert.equal(project.settings.environment, 'snow');
+  for (const environment of ['snow', 'grass', 'desert']) {
+    project.settings.environment = environment;
+    assert.deepEqual(parseProject(JSON.stringify(project)), project);
+  }
+});
+
+test('schema 2 rejects unknown or missing environments instead of silently replacing them', () => {
+  for (const environment of [undefined, null, '', 'ocean', '__proto__', { type: 'snow' }]) {
+    const project = createProject(42);
+    project.version = 2;
+    project.settings.environment = environment;
+    assert.throws(() => parseProject(JSON.stringify(project)));
+  }
+});
+
+for (const type of ['broadleaf', 'flowers', 'rock', 'mushroom']) {
+  test(`${type} paints deterministic duplicate-free regions and supports history`, () => {
+    const a = createStore(createProject(42));
+    const b = createStore(createProject(42));
+    paint(a, { type, radius: 0.4 });
+    paint(b, { type, radius: 0.4 });
+    assert.ok(a.project.objects.length > 2);
+    assert.ok(a.project.objects.every((object) => object.type === type));
+    assert.deepEqual(a.project.objects, b.project.objects);
+    const before = structuredClone(a.project.objects);
+    paint(a, { type, radius: 0.4 });
+    assert.deepEqual(a.project.objects, before);
+    assert.deepEqual(parseProject(JSON.stringify(a.project)), a.project);
+    a.undo();
+    assert.equal(a.project.objects.length, 0);
+    a.redo();
+    assert.deepEqual(a.project.objects, before);
+  });
+}
+
+test('new brush radius and density control population rather than object size', () => {
+  for (const type of ['broadleaf', 'flowers', 'rock', 'mushroom']) {
+    const small = createStore(createProject(39));
+    const large = createStore(createProject(39));
+    const sparse = createStore(createProject(39));
+    paint(small, { type, radius: 0.16, density: 1 });
+    paint(large, { type, radius: 0.5, density: 1 });
+    paint(sparse, { type, radius: 0.5, density: 0 });
+    assert.ok(large.project.objects.length > small.project.objects.length * 2, type);
+    assert.equal(sparse.project.objects.length, 0);
+    assert.ok(large.project.objects.every((o) => o.scale >= 0.75 && o.scale <= 1.2));
+  }
+});
+
+test('all six types honor physical spacing, including differently sized neighbors', () => {
+  const store = createStore(createProject(39));
+  const bounds = { tree: 0.06, house: 0.115, broadleaf: 0.105, flowers: 0.05, rock: 0.08, mushroom: 0.067 };
+  const types = Object.keys(bounds);
+  types.forEach((type, i) => paint(store, { type, radius: 0.4, points: [at((i - 2.5) * 0.33)], density: 1 }));
+  assert.deepEqual(new Set(store.project.objects.map((o) => o.type)), new Set(types));
+  const objects = store.project.objects;
+  for (let i = 0; i < objects.length; i++) {
+    for (let j = i + 1; j < objects.length; j++) {
+      const a = objects[i], b = objects[j];
+      const cosine = a.direction.reduce((sum, n, k) => sum + n * b.direction[k], 0);
+      assert.ok(Math.acos(Math.min(1, cosine)) + 1e-8 >= bounds[a.type] * a.scale + bounds[b.type] * b.scale, `${a.id}, ${b.id}`);
+    }
+  }
+});
+
+test('theme changes never relocate objects and brush history preserves the later theme', () => {
+  const store = createStore(createProject(42));
+  paint(store, { type: 'flowers' });
+  const before = structuredClone(store.project.objects);
+  store.project.settings.environment = 'desert';
+  assert.deepEqual(store.project.objects, before);
+  store.undo();
+  assert.equal(store.project.settings.environment, 'desert');
+  store.redo();
+  assert.equal(store.project.settings.environment, 'desert');
+  assert.deepEqual(store.project.objects, before);
 });
