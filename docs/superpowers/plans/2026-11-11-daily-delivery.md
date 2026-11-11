@@ -39,9 +39,9 @@ GitHub Actions/Pages, native Codex heartbeat.
 Published entries additionally record `completedDate`, `commit`, `workflowUrl`,
 and `report`. Reports live at `docs/daily-reports/day-NN.md`.
 
-- [ ] Record the approved 30 features, dates, acceptance checks, and failure policy.
-- [ ] Validate JSON, unique consecutive day numbers, date order, and pending state.
-- [ ] Verify readme links and commit only project-scoped documents.
+- [x] Record the approved 30 features, dates, acceptance checks, and failure policy.
+- [x] Validate JSON, unique consecutive day numbers, date order, and pending state.
+- [x] Verify readme links and commit only project-scoped documents.
 
 ## Task 2: Tested Production Delivery
 
@@ -50,13 +50,13 @@ and `report`. Reports live at `docs/daily-reports/day-NN.md`.
 **Interface:** Workflow `Test and deploy`; `build` must pass before `deploy`;
 published `release.json` returns `{commit, builtAt}` for exact version checks.
 
-- [ ] Add PR test/build and main-only Pages upload/deployment, with minimal
+- [x] Add PR test/build and main-only Pages upload/deployment, with minimal
   permissions and pinned official Actions.
-- [ ] Run `npm test`, `npm run build`, and `git diff --check` locally.
-- [ ] Enable Pages for this repository and push the setup/documents.
-- [ ] Wait for the actual Actions result, check the public marker against SHA,
+- [x] Run `npm test`, `npm run build`, and `git diff --check` locally.
+- [x] Enable Pages for this repository and push the setup/documents.
+- [x] Wait for the actual Actions result, check the public marker against SHA,
   and inspect the real online editor with Playwright at desktop/mobile sizes.
-- [ ] A failure blocks the setup completion claim; repair and re-verify.
+- [x] A failure blocks the setup completion claim; repair and re-verify.
 
 ## Task 3: Native Recurring Execution
 
@@ -64,11 +64,14 @@ published `release.json` returns `{commit, builtAt}` for exact version checks.
 Prompt explicitly selects the earliest due unfinished item, implements it,
 tests it, commits, deploys, and verifies online; it is not a reminder.
 
-- [ ] Inspect existing automations and update a matching one instead of duplicating.
-- [ ] Create the heartbeat through the native automation tool; never edit
+- [x] Inspect existing automations and update a matching one instead of duplicating.
+- [x] Create the heartbeat through the native automation tool; never edit
   automation storage or create system cron as a substitute.
-- [ ] Confirm its active state, schedule, and actual returned first execution.
-- [ ] Report the plan path, schedule, online address, and local-runtime caveat.
+- [x] Confirm its active state and daily 09:00 schedule. The tool does not return
+  a next-run timestamp; the approved first eligible date is 2026-11-12.
+- [x] Report the plan path, schedule, online address, and local-runtime caveat.
+
+Setup evidence: `docs/daily-reports/setup-2026-11-11.md`.
 
 ## Daily Implementation Contract
 
