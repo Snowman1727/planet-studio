@@ -1,113 +1,178 @@
+<div align="center">
+
 # Planet Studio
 
-在空白的小星球上，用画笔种下一片森林，画出一群木屋。
-区域内的物件会自动排列，完成后可以导出为可交互的独立 HTML，嵌入自己的网页。
+**Paint a little world. Make it your own.**
 
-这是从个人主页中独立出来的星球生成器，目前为 v0.1。
-不需要后端、账号或 API Key。
+A visual 3D planet editor for creating low-poly miniature worlds.<br>
+Paint forests, grow a village, and take your planet to the web.
 
-![Planet Studio 编辑器](docs/preview.png)
+**English** · [简体中文](README.zh-CN.md)
 
-## 已有功能
+[Try the Editor](https://snowman1727.github.io/planet-studio/) · [Features](#features) · [Get Started](#get-started) · [Export & Embed](#export--embed)
 
-- 空白星球，森林、木屋、阔叶树、花丛、岩石、蘑菇六种画笔，以及橡皮和旋转工具。
-- 雪原、草地、沙漠三种整体环境，分别改变地表、植被配色与光照。
-- 球面区域绘制，可调画笔范围和密度，自动调整物件朝向、大小和间距。
-- 按完整笔画撤销、重做；中断绘制时回滚未完成的笔画。
-- 本地草稿恢复，JSON 项目导入和保存。
-- 实时预览、飘雪、自动旋转和暂停，支持减少动态效果的系统设置。
-- 导出包含场景数据及 Three.js 运行时的单文件 HTML，可离线打开。
-- 生成 iframe 嵌入代码，适配桌面和手机。
+</div>
 
-## 本地运行
+![Planet Studio editor showing a miniature grassland planet, region brushes, and environment controls](docs/preview.png)
 
-使用 Node.js 24 或更新版本：
+## A World Built With Brushstrokes
+
+Planet Studio turns an empty globe into a world you can shape with a brush.
+Instead of placing every tree or cabin by hand, paint a region and let the
+editor arrange its objects across the curved surface, with varied sizes,
+orientations, and spacing.
+
+Build a snowy woodland, a green retreat, or a desert settlement. Keep your
+composition as you switch environments, then export an interactive planet
+for a personal website, portfolio, or creative experiment.
+
+## Features
+
+| | What you can create |
+| --- | --- |
+| **Region brushes** | Paint pine forests, cabins, broadleaf trees, flower patches, rocks, and mushrooms. Adjust brush radius and density to shape each area. |
+| **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
+| **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
+| **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
+| **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
+| **Portable creations** | Export a self-contained, interactive HTML file that opens offline or embeds in another page. |
+
+## Create Your Planet
+
+1. **Start with a blank globe.** Choose snow, grassland, or desert as its environment.
+2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
+3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. Switching environments preserves the arrangement.
+4. **Save and share.** Save JSON to keep editing later. Export HTML when your planet is ready to display.
+
+The editor adapts to desktop and mobile screens. On phones, scroll the bottom
+tool panel to reach all brushes and environment settings.
+
+## Get Started
+
+Use **Node.js 24 or newer** and a browser with **WebGL 2** support.
 
 ```sh
+git clone https://github.com/Snowman1727/planet-studio.git
+cd planet-studio
 npm ci
 npm run dev
 ```
 
-打开终端显示的本地地址，首页就是编辑器。
+Open the local address printed in your terminal to enter the editor.
+The editor interface is currently in Simplified Chinese; this documentation
+is available in both English and Chinese.
 
-```sh
-npm test
-npm run build
-npm run preview
-```
+## Export & Embed
 
-生产文件位于 `dist/`，可以部署到静态网页托管服务。资源使用相对路径，
-也可以部署在子目录中。
+### Keep an Editable Copy
 
-## 编辑与导出
+Save your planet as **JSON** to preserve its objects, positions, orientations,
+sizes, environment, and view. Import it to continue working later.
 
-选择森林或木屋工具，在球面上拖动画笔。切换到旋转工具后再拖动星球，
-绘制时不会同时旋转。
+Local draft recovery uses browser storage. Download JSON for projects you
+want to keep, since clearing browser data also removes the local draft.
 
-六种画笔都按区域自动排列，可以混合使用。切换环境不会移动、删除或重新生成
-已有物件；雪原中的树冠积雪、屋顶积雪及飘雪在草地和沙漠环境中隐藏。
-飘雪偏好仍会保存，切回雪原后恢复。手机端底部工具区可以滚动，所有画笔和
-环境选项都可操作。
+### Take Your World to the Web
 
-画布获得焦点后，方向键旋转、Enter 盖章、Escape 取消当前笔画。
-在文本输入框之外，Cmd/Ctrl+Z 撤销，Cmd/Ctrl+Shift+Z 重做。
-
-JSON 用来保存可继续编辑的项目，保留物件的最终位置、朝向、尺寸和场景设置。
-本地恢复依赖浏览器存储，重要作品请主动下载 JSON。
-新版保存为 JSON 格式版本 2；导入旧版版本 1 的作品时，会保留全部物件和视角，
-并读取为雪原环境。旧版编辑器不支持新版存档。
-
-HTML 用来展示和分享。下载后可以直接离线打开，也可以上传到网站，
-再在导出窗口填入实际文件路径并复制 iframe 代码。例如：
+Export **HTML** for a self-contained viewer with scene data and the Three.js
+runtime included. Open the file offline, or upload it alongside your website
+and embed it:
 
 ```html
 <iframe
   src="./my-planet.html"
-  title="我的小星球"
+  title="My miniature planet"
   loading="lazy"
   style="width:100%;height:500px;border:0"
 ></iframe>
 ```
 
-导出的文件不依赖 CDN 或编辑器服务器。宿主网站需要允许 iframe，
-严格的内容安全策略也可能需要允许文件中的内联脚本。
+Point `src` at the actual location of your exported file. The export dialog
+also generates embed code from a file path you provide.
 
-## 当前限制
+The viewer does not load a CDN or contact the editor server. Your host page
+must allow iframes; strict content security policies may also need to allow
+the exported file's inline scripts. HTML is a presentation file, not a
+replacement for an editable JSON project.
 
-- 最多 2,000 个物件，40 步撤销历史，导入文件不超过 2 MB。
-- 环境是整颗星球的预设，不能在同一星球绘制多种地貌。
-- 不包含地形雕刻、道路、河流或自定义模型。
-- 需要支持 WebGL 2 的浏览器。
-- 没有云同步或多人协作，HTML 展示文件不能代替 JSON 编辑项目。
-- Three.js 和离线导出运行时会产生较大的构建包，构建时可能出现体积警告。
+## Controls
 
-## 代码结构
+| Action | Control |
+| --- | --- |
+| Paint or erase | Drag on the globe with the selected brush |
+| Rotate | Select the rotation tool, then drag |
+| Rotate with the keyboard | Arrow keys while the canvas is focused |
+| Stamp a brush | Enter while the canvas is focused |
+| Cancel the current stroke | Escape |
+| Undo | Cmd/Ctrl + Z |
+| Redo | Cmd/Ctrl + Shift + Z |
+
+Undo and redo shortcuts apply outside text inputs.
+
+## Development
+
+Built with **JavaScript**, **Three.js**, **Vite**, and **Lucide**, with
+**Sora** typography. Planets and decorations are generated in code.
+
+```sh
+npm test          # Model, geometry, compatibility, and export safety tests
+npm run build    # Build the editor and standalone export runtime
+npm run preview  # Preview the production build locally
+```
+
+Build output is written to `dist/`. Relative asset paths support static
+hosting at a domain root or in a subdirectory. Three.js and the standalone
+export runtime produce a large bundle, so builds may report a chunk-size warning.
+
+### Project Structure
 
 ```text
 prototype/
-  index.html          编辑器入口
-  vite.config.js      构建与离线播放器打包
+  index.html           Editor entry
+  vite.config.js       Build and standalone player bundling
   studio/
-    catalog.js        画笔占地范围与环境配色
-    assets.js         六种画笔的低多边形模型
-    model.js          球面采样、排列、项目校验与撤销历史
-    scene.js          编辑器和播放器共享的 Three.js 场景
-    main.js           编辑器交互与草稿恢复
-    player.js         独立播放器
-    export.js         HTML 导出与嵌入代码
-    style.css         响应式界面
-tests/
-  studio-assets.test.js
-  studio-model.test.js
-  studio-export.test.js
+    catalog.js         Brush footprints and environment palettes
+    assets.js          Procedural decoration geometry
+    model.js           Placement, validation, and stroke history
+    scene.js           Shared editor and player renderer
+    main.js            Editor interaction and draft recovery
+    player.js          Standalone viewer interaction
+    export.js          HTML export and embed code
+    style.css          Responsive editor styles
+tests/                 Model, geometry, and export tests
 ```
 
-`npm test` 验证模型排列、存档兼容、几何占地范围和导出安全。所有物件和星球由代码生成，
-不依赖外部模型素材。界面使用 Lucide 图标与 Sora 字体；
-依赖的许可证仍分别适用，HTML 导出保留 Three.js 的 MIT 许可声明。
+## Scope & Compatibility
 
-## 许可证
+- Up to **2,000 objects**, **40 undo steps**, and **2 MB** per JSON import.
+- Environments apply to the whole planet, not individually painted biomes.
+- Terrain sculpting, roads, rivers, and custom model imports are not implemented.
+- Cloud synchronization and multiplayer editing are not included.
+- Projects are saved as schema version **2**. Version **1** projects import
+  as snow worlds while retaining their objects and view; older editors cannot
+  read the new format.
+- Snowfall preferences are preserved across environments and take effect
+  when returning to snow.
 
-项目代码采用 [MIT License](LICENSE)，版权归 Snowman1727 所有。
-允许使用、修改、分发和商用，需保留版权及许可声明。
-第三方字体和依赖仍遵循各自的许可证；HTML 导出保留项目与 Three.js 的许可声明。
+## Contributing
+
+Bug reports, ideas, and pull requests are welcome. For bug reports, include
+your browser, reproduction steps, and, when possible, a minimal JSON project
+with any private content removed.
+
+For larger changes, open an issue first to discuss the approach. Preserve
+existing project compatibility, deterministic placement, and offline exports,
+and run the tests and production build before submitting a pull request.
+
+### Daily Feature Roadmap
+
+See the [30-day feature plan](DAILY_PLAN.md) for the planned daily additions
+and acceptance criteria. [Delivery progress](docs/daily-progress.json) tracks
+what has actually shipped. Planned features are not current capabilities.
+
+## License
+
+[MIT](LICENSE) · Copyright (c) 2026 Snowman1727.
+
+Third-party dependencies and fonts retain their respective licenses.
+Exported HTML includes the Planet Studio and Three.js MIT notices.
