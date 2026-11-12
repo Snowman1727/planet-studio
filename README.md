@@ -59,8 +59,9 @@ npm run dev
 ```
 
 Open the local address printed in your terminal to enter the editor.
-The editor interface is currently in Simplified Chinese; this documentation
-is available in both English and Chinese.
+Switch between English and Simplified Chinese in the editor toolbar. Your
+language preference is remembered locally, and exported HTML uses the selected
+language. Switching languages never changes your planet or its name.
 
 ## Export & Embed
 

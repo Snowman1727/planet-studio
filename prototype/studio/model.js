@@ -1,3 +1,5 @@
+import { localizedError } from './i18n.js';
+
 export const MAX_OBJECTS = 2000;
 export const MAX_FILE_BYTES = 2 * 1024 * 1024;
 export const HISTORY_LIMIT = 40;
@@ -5,7 +7,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const angle = (a, b) => Math.acos(clamp(dot(a, b), -1, 1));
 const clone = (value) => structuredClone(value);
-const fail = () => { throw new Error('星球文件格式不正确，或包含不支持的数据。'); };
+const fail = () => { throw localizedError('invalidProject'); };
 const bounded = (value, min, max) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
 
 export function createProject(seed = 1727) {
@@ -19,7 +21,7 @@ export function createProject(seed = 1727) {
 
 export function parseProject(text) {
   if (typeof text !== 'string' || new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
-    throw new Error('文件过大，请选择小于 2 MB 的星球 JSON 文件。');
+    throw localizedError('fileTooLarge');
   }
   let doc;
   try { doc = JSON.parse(text); } catch { fail(); }
@@ -172,7 +174,7 @@ export function createStore(initial) {
     get canRedo() { return future.length > 0; },
     begin(type, radius, density) {
       if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1)) {
-        throw new Error('画笔参数无效。');
+        throw localizedError('invalidBrush');
       }
       cancel();
       stroke = { type, radius, density, before: clone(project), last: null, needed: radius / 4 };

@@ -1,4 +1,5 @@
 import { parseProject } from './model.js';
+import { normalizeLocale, t } from './i18n.js';
 
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -6,16 +7,17 @@ export function safeFilename(name) {
   return String(name).normalize('NFKC').replace(/[^\p{L}\p{N}_-]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'my-planet';
 }
 
-export function embedCode(path = '/my-planet.html') {
-  return `<iframe src="${escapeHTML(path)}" title="我的小星球" loading="lazy" style="width:100%;height:500px;border:0"></iframe>`;
+export function embedCode(path = '/my-planet.html', locale = 'zh-CN') {
+  return `<iframe src="${escapeHTML(path)}" title="${t(locale, 'embedTitle')}" loading="lazy" style="width:100%;height:500px;border:0"></iframe>`;
 }
 
-export function buildHTML(project, runtime) {
+export function buildHTML(project, runtime, locale = 'zh-CN') {
+  locale = normalizeLocale(locale);
   const validated = parseProject(JSON.stringify(project));
   const data = JSON.stringify(validated).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const script = runtime.replace(/<\/script/gi, '<\\/script');
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${locale}">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHTML(validated.name)}</title>
 <style>
@@ -26,8 +28,8 @@ button:focus-visible{outline:2px solid #9de9cd;outline-offset:3px}
 #player-error{position:fixed;inset:40% 16px auto;text-align:center;color:#738f82}
 [hidden]{display:none!important}
 </style></head>
-<body><canvas id="planet-player" tabindex="0" aria-label="${escapeHTML(validated.name)}，可旋转的三维星球"></canvas>
-<button id="player-pause" type="button" aria-label="暂停动画">暂停</button>
+<body><canvas id="planet-player" tabindex="0" aria-label="${escapeHTML(t(locale, 'playerCanvas', { name: validated.name }))}"></canvas>
+<button id="player-pause" type="button" aria-label="${t(locale, 'pauseAnimation')}">${t(locale, 'pause')}</button>
 <p id="player-error" role="alert" hidden></p>
 <script id="planet-data" type="application/json">${data}</script>
 <script>${script}</script>

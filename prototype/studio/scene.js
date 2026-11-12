@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 import { BRUSHES, ENVIRONMENTS } from './catalog.js';
 import { createAssets } from './assets.js';
+import { localizedError } from './i18n.js';
 
 const RADIUS = 2.08;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -209,7 +210,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   const contextLost = (event) => {
     event.preventDefault();
     renderer.setAnimationLoop(null);
-    onError(new Error('三维画面已中断。请先保存 JSON，再刷新页面。'));
+    onError(localizedError('contextLost'));
   };
   const motionChange = () => { dirty = true; };
   canvas.addEventListener('webglcontextlost', contextLost);

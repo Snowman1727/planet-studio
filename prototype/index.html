@@ -10,72 +10,73 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="studio-brand" href="./" aria-label="Planet Studio 首页"><i data-lucide="orbit"></i><span>Planet <strong>Studio</strong></span></a>
+    <a class="studio-brand" href="./" aria-label="Planet Studio 首页" data-i18n-label="home"><i data-lucide="orbit"></i><span>Planet <strong>Studio</strong></span></a>
     <div class="project-heading">
       <span class="top-divider"></span>
-      <input id="project-name" aria-label="星球名称" maxlength="80" value="未命名星球" spellcheck="false">
+      <input id="project-name" aria-label="星球名称" data-i18n-label="projectName" maxlength="80" value="未命名星球" spellcheck="false">
       <span id="save-state" class="save-state">新作品</span>
     </div>
     <div class="top-actions">
       <div class="history-actions">
-        <button class="icon-button" id="undo" aria-label="撤销" title="撤销" disabled><i data-lucide="undo-2"></i></button>
-        <button class="icon-button" id="redo" aria-label="重做" title="重做" disabled><i data-lucide="redo-2"></i></button>
+        <button class="icon-button" id="undo" aria-label="撤销" title="撤销" data-i18n-label="undo" data-i18n-title="undo" disabled><i data-lucide="undo-2"></i></button>
+        <button class="icon-button" id="redo" aria-label="重做" title="重做" data-i18n-label="redo" data-i18n-title="redo" disabled><i data-lucide="redo-2"></i></button>
       </div>
-      <button class="icon-button" id="new-project" aria-label="新建星球" title="新建星球"><i data-lucide="file-plus-2"></i></button>
-      <button class="icon-button" id="import-project" aria-label="导入 JSON" title="导入 JSON"><i data-lucide="folder-open"></i></button>
-      <button class="icon-button" id="save-project" aria-label="保存 JSON" title="保存 JSON"><i data-lucide="save"></i></button>
-      <button class="primary-button" id="open-export"><i data-lucide="download"></i><span>导出</span></button>
+      <button class="icon-button" id="new-project" aria-label="新建星球" title="新建星球" data-i18n-label="newPlanet" data-i18n-title="newPlanet"><i data-lucide="file-plus-2"></i></button>
+      <button class="icon-button" id="import-project" aria-label="导入 JSON" title="导入 JSON" data-i18n-label="importJSON" data-i18n-title="importJSON"><i data-lucide="folder-open"></i></button>
+      <button class="icon-button" id="save-project" aria-label="保存 JSON" title="保存 JSON" data-i18n-label="saveJSON" data-i18n-title="saveJSON"><i data-lucide="save"></i></button>
+      <select id="language-setting" aria-label="界面语言" data-i18n-label="language"><option value="zh-CN">中文</option><option value="en">English</option></select>
+      <button class="primary-button" id="open-export" aria-label="导出" data-i18n-label="export" title="导出" data-i18n-title="export"><i data-lucide="download"></i><span data-i18n="export">导出</span></button>
     </div>
   </header>
 
   <main class="workspace">
-    <aside class="toolpanel" aria-label="编辑工具">
-      <div class="panel-heading"><h1>星球画室</h1><span class="version">v0.1</span></div>
+    <aside class="toolpanel" aria-label="编辑工具" data-i18n-label="editorTools">
+      <div class="panel-heading"><h1 data-i18n="studio">星球画室</h1><span class="version">v0.1</span></div>
       <fieldset class="tool-options">
-        <legend>工具</legend>
+        <legend data-i18n="tools">工具</legend>
         <div class="tool-grid">
-        <button class="mode-button" data-mode="tree" aria-label="森林" aria-pressed="true"><span class="tool-symbol forest-symbol"><i data-lucide="trees"></i></span><span>森林</span><span class="material-dot forest-dot"></span></button>
-        <button class="mode-button" data-mode="house" aria-label="木屋" aria-pressed="false"><span class="tool-symbol house-symbol"><i data-lucide="house"></i></span><span>木屋</span><span class="material-dot house-dot"></span></button>
-        <button class="mode-button" data-mode="broadleaf" aria-label="阔叶树" aria-pressed="false"><span class="tool-symbol broadleaf-symbol"><i data-lucide="tree-deciduous"></i></span><span>阔叶树</span></button>
-        <button class="mode-button" data-mode="flowers" aria-label="花丛" aria-pressed="false"><span class="tool-symbol flowers-symbol"><i data-lucide="flower-2"></i></span><span>花丛</span></button>
-        <button class="mode-button" data-mode="rock" aria-label="岩石" aria-pressed="false"><span class="tool-symbol rock-symbol"><i data-lucide="mountain"></i></span><span>岩石</span></button>
-        <button class="mode-button" data-mode="mushroom" aria-label="蘑菇" aria-pressed="false"><span class="tool-symbol mushroom-symbol"><i data-lucide="umbrella"></i></span><span>蘑菇</span></button>
-        <button class="mode-button" data-mode="erase" aria-label="橡皮" aria-pressed="false"><span class="tool-symbol"><i data-lucide="eraser"></i></span><span>橡皮</span></button>
-        <button class="mode-button" data-mode="rotate" aria-label="旋转" aria-pressed="false"><span class="tool-symbol"><i data-lucide="rotate-3d"></i></span><span>旋转</span></button>
+        <button class="mode-button" data-mode="tree" aria-label="森林" data-i18n-label="tree" aria-pressed="true"><span class="tool-symbol forest-symbol"><i data-lucide="trees"></i></span><span data-i18n="tree">森林</span><span class="material-dot forest-dot"></span></button>
+        <button class="mode-button" data-mode="house" aria-label="木屋" data-i18n-label="house" aria-pressed="false"><span class="tool-symbol house-symbol"><i data-lucide="house"></i></span><span data-i18n="house">木屋</span><span class="material-dot house-dot"></span></button>
+        <button class="mode-button" data-mode="broadleaf" aria-label="阔叶树" data-i18n-label="broadleaf" aria-pressed="false"><span class="tool-symbol broadleaf-symbol"><i data-lucide="tree-deciduous"></i></span><span data-i18n="broadleaf">阔叶树</span></button>
+        <button class="mode-button" data-mode="flowers" aria-label="花丛" data-i18n-label="flowers" aria-pressed="false"><span class="tool-symbol flowers-symbol"><i data-lucide="flower-2"></i></span><span data-i18n="flowers">花丛</span></button>
+        <button class="mode-button" data-mode="rock" aria-label="岩石" data-i18n-label="rock" aria-pressed="false"><span class="tool-symbol rock-symbol"><i data-lucide="mountain"></i></span><span data-i18n="rock">岩石</span></button>
+        <button class="mode-button" data-mode="mushroom" aria-label="蘑菇" data-i18n-label="mushroom" aria-pressed="false"><span class="tool-symbol mushroom-symbol"><i data-lucide="umbrella"></i></span><span data-i18n="mushroom">蘑菇</span></button>
+        <button class="mode-button" data-mode="erase" aria-label="橡皮" data-i18n-label="erase" aria-pressed="false"><span class="tool-symbol"><i data-lucide="eraser"></i></span><span data-i18n="erase">橡皮</span></button>
+        <button class="mode-button" data-mode="rotate" aria-label="旋转" data-i18n-label="rotate" aria-pressed="false"><span class="tool-symbol"><i data-lucide="rotate-3d"></i></span><span data-i18n="rotate">旋转</span></button>
         </div>
       </fieldset>
       <fieldset class="brush-options">
-        <legend>画笔</legend>
-        <label class="range-label" for="brush-radius"><span>范围</span><output id="radius-value">16°</output></label>
+        <legend data-i18n="brush">画笔</legend>
+        <label class="range-label" for="brush-radius"><span data-i18n="radius">范围</span><output id="radius-value">16°</output></label>
         <input id="brush-radius" type="range" min="7" max="35" value="16">
-        <label class="range-label" for="brush-density"><span>密度</span><output id="density-value">65%</output></label>
+        <label class="range-label" for="brush-density"><span data-i18n="density">密度</span><output id="density-value">65%</output></label>
         <input id="brush-density" type="range" min="10" max="100" value="65" step="5">
       </fieldset>
       <fieldset class="environment-options">
-        <legend>环境</legend>
+        <legend data-i18n="environment">环境</legend>
         <div class="environment-switch">
-          <label class="environment-choice"><input type="radio" name="environment" value="snow" checked><span class="environment-swatch swatch-snow"></span><span>雪原</span></label>
-          <label class="environment-choice"><input type="radio" name="environment" value="grass"><span class="environment-swatch swatch-grass"></span><span>草地</span></label>
-          <label class="environment-choice"><input type="radio" name="environment" value="desert"><span class="environment-swatch swatch-desert"></span><span>沙漠</span></label>
+          <label class="environment-choice"><input type="radio" name="environment" value="snow" checked><span class="environment-swatch swatch-snow"></span><span data-i18n="snow">雪原</span></label>
+          <label class="environment-choice"><input type="radio" name="environment" value="grass"><span class="environment-swatch swatch-grass"></span><span data-i18n="grass">草地</span></label>
+          <label class="environment-choice"><input type="radio" name="environment" value="desert"><span class="environment-swatch swatch-desert"></span><span data-i18n="desert">沙漠</span></label>
         </div>
-        <label class="check-row" id="snow-option"><span>飘雪</span><input id="snow-setting" type="checkbox" checked></label>
-        <label class="check-row"><span>自动旋转</span><input id="rotation-setting" type="checkbox" checked></label>
+        <label class="check-row" id="snow-option"><span data-i18n="snowfall">飘雪</span><input id="snow-setting" type="checkbox" checked></label>
+        <label class="check-row"><span data-i18n="autoRotate">自动旋转</span><input id="rotation-setting" type="checkbox" checked></label>
       </fieldset>
       <div class="composition">
-        <span>物件</span><span><output id="object-count">0</output><span class="object-limit"> / 2,000</span></span>
+        <span data-i18n="objects">物件</span><span><output id="object-count">0</output><span class="object-limit"> / 2,000</span></span>
         <div class="composition-meter"><span id="object-meter"></span></div>
         <div class="composition-types">
-          <span title="松林数量"><i data-lucide="tree-pine"></i><output id="tree-count" aria-label="松林数量">0</output></span>
-          <span title="木屋数量"><i data-lucide="house"></i><output id="house-count" aria-label="木屋数量">0</output></span>
-          <span title="阔叶树数量"><i data-lucide="tree-deciduous"></i><output id="broadleaf-count" aria-label="阔叶树数量">0</output></span>
-          <span title="花丛数量"><i data-lucide="flower-2"></i><output id="flowers-count" aria-label="花丛数量">0</output></span>
-          <span title="岩石数量"><i data-lucide="mountain"></i><output id="rock-count" aria-label="岩石数量">0</output></span>
-          <span title="蘑菇数量"><i data-lucide="umbrella"></i><output id="mushroom-count" aria-label="蘑菇数量">0</output></span>
+          <span data-i18n-title="treeCount" title="松林数量"><i data-lucide="tree-pine"></i><output id="tree-count" data-i18n-label="treeCount" aria-label="松林数量">0</output></span>
+          <span data-i18n-title="houseCount" title="木屋数量"><i data-lucide="house"></i><output id="house-count" data-i18n-label="houseCount" aria-label="木屋数量">0</output></span>
+          <span data-i18n-title="broadleafCount" title="阔叶树数量"><i data-lucide="tree-deciduous"></i><output id="broadleaf-count" data-i18n-label="broadleafCount" aria-label="阔叶树数量">0</output></span>
+          <span data-i18n-title="flowersCount" title="花丛数量"><i data-lucide="flower-2"></i><output id="flowers-count" data-i18n-label="flowersCount" aria-label="花丛数量">0</output></span>
+          <span data-i18n-title="rockCount" title="岩石数量"><i data-lucide="mountain"></i><output id="rock-count" data-i18n-label="rockCount" aria-label="岩石数量">0</output></span>
+          <span data-i18n-title="mushroomCount" title="蘑菇数量"><i data-lucide="umbrella"></i><output id="mushroom-count" data-i18n-label="mushroomCount" aria-label="蘑菇数量">0</output></span>
         </div>
       </div>
     </aside>
 
-    <section class="stage" id="stage" data-count="0" aria-label="星球画布">
+    <section class="stage" id="stage" data-count="0" aria-label="星球画布" data-i18n-label="planetCanvas">
       <div class="stage-top">
         <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span><span class="scene-divider">/</span><span id="environment-label">雪原</span></div>
         <div class="view-actions">
@@ -83,29 +84,29 @@
           <button class="secondary-button" id="preview" aria-pressed="false"><i data-lucide="eye"></i><span id="preview-label">预览</span></button>
         </div>
       </div>
-      <canvas id="studio-canvas" tabindex="0" aria-label="三维星球画布"></canvas>
+      <canvas id="studio-canvas" tabindex="0" aria-label="三维星球画布" data-i18n-label="canvas"></canvas>
       <div class="stage-loading" id="stage-loading"><span class="loading-line"></span></div>
       <p class="scene-error" id="scene-error" role="alert" hidden></p>
       <div class="stage-bottom"><span id="seed-label">SEED · 1727</span><span id="scene-detail">空白星球</span></div>
     </section>
   </main>
-  <footer class="statusbar"><span class="status-message" id="status" role="status" aria-live="polite">已就绪</span><span id="history-note">撤销历史 40 步</span></footer>
+  <footer class="statusbar"><span class="status-message" id="status" role="status" aria-live="polite">已就绪</span><span id="history-note" data-i18n="history">撤销历史 40 步</span></footer>
   <input id="project-file" type="file" accept=".json,application/json" hidden>
 
   <dialog id="replace-dialog" aria-labelledby="replace-title">
-    <div class="dialog-heading"><h2 id="replace-title">替换当前星球？</h2><button class="icon-button" data-close="replace-dialog" aria-label="取消替换"><i data-lucide="x"></i></button></div>
-    <p class="dialog-description">当前作品尚未导出 JSON。</p>
-    <div class="dialog-actions"><button class="secondary-button" id="save-before-replace"><i data-lucide="save"></i>先保存 JSON</button><button class="danger-button" id="confirm-replace">替换</button></div>
+    <div class="dialog-heading"><h2 id="replace-title" data-i18n="replaceTitle">替换当前星球？</h2><button class="icon-button" data-close="replace-dialog" aria-label="取消替换" data-i18n-label="cancelReplace"><i data-lucide="x"></i></button></div>
+    <p class="dialog-description" data-i18n="replaceDescription">当前作品尚未导出 JSON。</p>
+    <div class="dialog-actions"><button class="secondary-button" id="save-before-replace"><i data-lucide="save"></i><span data-i18n="saveFirst">先保存 JSON</span></button><button class="danger-button" id="confirm-replace" data-i18n="replace">替换</button></div>
   </dialog>
 
   <dialog id="export-dialog" aria-labelledby="export-title">
-    <div class="dialog-heading"><h2 id="export-title">导出星球</h2><button class="icon-button" data-close="export-dialog" aria-label="关闭导出"><i data-lucide="x"></i></button></div>
-    <div class="export-file-row"><span class="file-symbol"><i data-lucide="file-code-2"></i></span><div><strong id="export-filename">my-planet.html</strong><span>独立 HTML</span></div><span id="export-object-count"></span></div>
-    <label class="field-label" for="embed-path">网页中的文件路径</label>
+    <div class="dialog-heading"><h2 id="export-title" data-i18n="exportTitle">导出星球</h2><button class="icon-button" data-close="export-dialog" aria-label="关闭导出" data-i18n-label="closeExport"><i data-lucide="x"></i></button></div>
+    <div class="export-file-row"><span class="file-symbol"><i data-lucide="file-code-2"></i></span><div><strong id="export-filename">my-planet.html</strong><span data-i18n="standaloneHTML">独立 HTML</span></div><span id="export-object-count"></span></div>
+    <label class="field-label" for="embed-path" data-i18n="filePath">网页中的文件路径</label>
     <input class="text-input" id="embed-path" value="/my-planet.html" maxlength="300" spellcheck="false">
-    <div class="code-label"><label class="field-label" for="embed-code">嵌入代码</label><button class="icon-button" id="copy-embed" aria-label="复制嵌入代码" title="复制嵌入代码"><i data-lucide="copy"></i></button></div>
-    <textarea id="embed-code" readonly aria-label="嵌入代码" rows="4" spellcheck="false"></textarea>
-    <div class="dialog-actions"><button class="primary-button" id="download-html"><i data-lucide="download"></i>下载 HTML</button></div>
+    <div class="code-label"><label class="field-label" for="embed-code" data-i18n="embedCode">嵌入代码</label><button class="icon-button" id="copy-embed" aria-label="复制嵌入代码" title="复制嵌入代码" data-i18n-label="copyEmbed" data-i18n-title="copyEmbed"><i data-lucide="copy"></i></button></div>
+    <textarea id="embed-code" readonly aria-label="嵌入代码" data-i18n-label="embedCode" rows="4" spellcheck="false"></textarea>
+    <div class="dialog-actions"><button class="primary-button" id="download-html"><i data-lucide="download"></i><span data-i18n="downloadHTML">下载 HTML</span></button></div>
   </dialog>
 </body>
 </html>

@@ -1,5 +1,7 @@
 import { createScene } from './scene.js';
+import { normalizeLocale, t, errorMessage } from './i18n.js';
 
+const locale = normalizeLocale(document.documentElement.lang);
 const canvas = document.querySelector('#planet-player');
 const button = document.querySelector('#player-pause');
 const error = document.querySelector('#player-error');
@@ -9,7 +11,7 @@ const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let paused = motion.matches;
 function showError(reason) {
   error.hidden = false;
-  error.textContent = reason.message || '此浏览器无法显示三维星球。';
+  error.textContent = errorMessage(reason, locale, 'playerUnavailable');
   button.hidden = true;
 }
 try {
@@ -18,8 +20,8 @@ try {
   scene.preview(true);
   scene.pause(paused);
   const update = () => {
-    button.textContent = paused ? '播放' : '暂停';
-    button.setAttribute('aria-label', paused ? '播放动画' : '暂停动画');
+    button.textContent = t(locale, paused ? 'play' : 'pause');
+    button.setAttribute('aria-label', t(locale, paused ? 'playAnimation' : 'pauseAnimation'));
     button.setAttribute('aria-pressed', String(paused));
     button.hidden = motion.matches;
   };
