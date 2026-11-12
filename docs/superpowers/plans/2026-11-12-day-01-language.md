@@ -58,10 +58,11 @@ locale and the standalone player reads its document language.
   browser-storage failure still permits locale switching and JSON download.
 - [x] Download English/Chinese HTML, open offline with network blocked,
   verify translated controls, rotation, pixels and unchanged project data.
-- [ ] Review the diff, commit with public noreply identity, push normally.
-- [ ] Wait for Actions; verify exact public release SHA and real online switching.
-- [ ] Record evidence and mark Day 01 published only after online verification;
-  commit report and verify its deployment. Do not implement Day 02.
+- [x] Review the diff, commit with public noreply identity, push normally.
+- [x] Wait for Actions; verify exact public release SHA and real online switching.
+- [x] Record evidence and mark Day 01 published only after online verification.
+- Publish the report commit and confirm its deployment as the final execution
+  gate after writing this record. Do not implement Day 02.
 
 ## Execution Record
 
@@ -82,3 +83,8 @@ locale and the standalone player reads its document language.
   to avoid squeezing "Grassland"; mobile retains the three-option row. Mobile
   export uses its download icon with a localized accessible name and tooltip.
 - Build retains the existing large-bundle warning; no dependency was added.
+- Production-browser suite: 76 assertions passed; the online suite passed 11
+  assertions, including the exact feature SHA. Full evidence in
+  `docs/daily-reports/day-01.md`.
+- Feature published as `b103dd27a7915bfb35ea2b298ffca244e3f2713d`;
+  Actions run `43134940442` succeeded. Day 02 remains pending.

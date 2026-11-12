@@ -5,7 +5,16 @@
   "scheduledTime": "09:00",
   "site": "https://snowman1727.github.io/planet-studio/",
   "tasks": [
-    { "day": 1, "scheduledDate": "2026-11-12", "feature": "界面中英文切换", "status": "pending" },
+    {
+      "day": 1,
+      "scheduledDate": "2026-11-12",
+      "feature": "界面中英文切换",
+      "status": "published",
+      "completedDate": "2026-11-12",
+      "commit": "b103dd27a7915bfb35ea2b298ffca244e3f2713d",
+      "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/43134940442",
+      "report": "docs/daily-reports/day-01.md"
+    },
     { "day": 2, "scheduledDate": "2026-11-13", "feature": "PNG 图片导出", "status": "pending" },
     { "day": 3, "scheduledDate": "2026-11-14", "feature": "镜头缩放", "status": "pending" },
     { "day": 4, "scheduledDate": "2026-11-15", "feature": "视角收藏", "status": "pending" },
