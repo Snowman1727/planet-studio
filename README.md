@@ -35,7 +35,7 @@ for a personal website, portfolio, or creative experiment.
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
-| **Portable creations** | Export a self-contained, interactive HTML file that opens offline or embeds in another page. |
+| **Portable creations** | Download a 1024/2048 square PNG with a transparent or dark background, or export a self-contained, interactive HTML file for offline use and embedding. |
 
 ## Create Your Planet
 
@@ -95,6 +95,15 @@ The viewer does not load a CDN or contact the editor server. Your host page
 must allow iframes; strict content security policies may also need to allow
 the exported file's inline scripts. HTML is a presentation file, not a
 replacement for an editable JSON project.
+
+### Save a Picture
+
+Choose **PNG** in the export dialog, select **1024 × 1024** or **2048 × 2048**,
+and download a snapshot. Transparent background is enabled by default; turn it
+off for the editor's dark backdrop. The image uses the displayed orientation
+and fits the whole planet and its decorations inside the square, without
+editor controls, brush outlines, stars or snowfall. Exporting does not change
+your composition, saved view or undo history.
 
 ## Controls
 

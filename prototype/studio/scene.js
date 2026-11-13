@@ -3,6 +3,7 @@ import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 import { BRUSHES, ENVIRONMENTS } from './catalog.js';
 import { createAssets } from './assets.js';
 import { localizedError } from './i18n.js';
+import { imageOptions, fitImageDistance } from './export.js';
 
 const RADIUS = 2.08;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -27,6 +28,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   let environment = doc.settings.environment || 'snow';
   let theme = ENVIRONMENTS[environment];
   let disposed = false;
+  let contextAvailable = true;
   let visible = true;
   let presenting = false;
   let paused = false;
@@ -209,6 +211,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   visibility.observe(canvas);
   const contextLost = (event) => {
     event.preventDefault();
+    contextAvailable = false;
     renderer.setAnimationLoop(null);
     onError(localizedError('contextLost'));
   };
@@ -280,6 +283,57 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       dirty = true;
     },
     view() { return { x: target.x, y: target.y }; },
+    async captureImage(options) {
+      const { size, transparent } = imageOptions(options);
+      if (disposed || !contextAvailable) throw localizedError('contextLost');
+      land.geometry.computeBoundingSphere();
+      let radius = land.geometry.boundingSphere.center.length() + land.geometry.boundingSphere.radius;
+      const sphere = new THREE.Sphere();
+      const instance = new THREE.Matrix4();
+      for (const part of parts) {
+        if (!part.mesh?.visible) continue;
+        part.geometry.computeBoundingSphere();
+        for (let i = 0; i < part.mesh.count; i++) {
+          part.mesh.getMatrixAt(i, instance);
+          sphere.copy(part.geometry.boundingSphere).applyMatrix4(instance);
+          radius = Math.max(radius, sphere.center.length() + sphere.radius);
+        }
+      }
+      const imageCamera = camera.clone();
+      imageCamera.aspect = 1;
+      imageCamera.position.set(0, 0, fitImageDistance(radius, imageCamera.fov));
+      imageCamera.updateProjectionMatrix();
+      const output = document.createElement('canvas');
+      output.width = output.height = size;
+      const context = output.getContext('2d');
+      if (!context) throw new Error('Image canvas unavailable');
+      const dimensions = renderer.getSize(new THREE.Vector2());
+      const pixelRatio = renderer.getPixelRatio();
+      const flags = [ring.visible, stars.visible, snow.visible];
+      try {
+        ring.visible = stars.visible = snow.visible = false;
+        renderer.setPixelRatio(1);
+        renderer.setSize(size, size, false);
+        renderer.render(scene, imageCamera);
+        if (!transparent) {
+          context.fillStyle = getComputedStyle(canvas.parentElement).backgroundColor;
+          context.fillRect(0, 0, size, size);
+        }
+        context.drawImage(canvas, 0, 0);
+      } finally {
+        [ring.visible, stars.visible, snow.visible] = flags;
+        renderer.setPixelRatio(pixelRatio);
+        renderer.setSize(dimensions.x, dimensions.y, false);
+        renderer.render(scene, camera);
+      }
+      // Copy first: encoding is asynchronous, but editor restoration must not be.
+      return new Promise((resolve, reject) => {
+        output.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('PNG encoding failed'));
+        }, 'image/png');
+      });
+    },
     preview(value) { presenting = value; ring.visible = false; dirty = true; },
     pause(value) { paused = value; dirty = true; },
     dispose() {

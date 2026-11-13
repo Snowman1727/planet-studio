@@ -34,6 +34,8 @@ let failed = false;
 let sceneError = null;
 let statusState = { key: 'ready', error: false, params: {} };
 let saveState = 'newWork';
+let exportingImage = false;
+let exportStatus = null;
 let pending = null;
 let storageTimer;
 let recoverySnapshot = null;
@@ -87,6 +89,13 @@ function renderLanguage() {
   setSaveState(saveState);
   renderStatus();
   updateEmbed();
+  renderExportStatus();
+}
+function renderExportStatus() {
+  $('export-status').textContent = exportStatus ? t(locale, exportStatus) : '';
+  $('export-status').dataset.error = String(exportStatus === 'pngFailed');
+  $('download-png').disabled = exportingImage || failed;
+  $('png-panel').setAttribute('aria-busy', String(exportingImage));
 }
 function renderError(error) {
   cancelStroke();
@@ -97,6 +106,7 @@ function renderError(error) {
   $('stage-loading').hidden = true;
   document.querySelectorAll('button[data-mode]').forEach((button) => { button.disabled = true; });
   $('preview').disabled = true;
+  renderExportStatus();
   announce('renderStatus', true);
 }
 function refresh({ fields = false } = {}) {
@@ -314,7 +324,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function download(content, filename, type) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
+  const url = URL.createObjectURL(content instanceof Blob ? content : new Blob([content], { type }));
   urls.add(url);
   const a = document.createElement('a');
   a.href = url;
@@ -375,6 +385,24 @@ document.querySelectorAll('[data-close]').forEach((button) => button.addEventLis
 $('replace-dialog').addEventListener('close', () => { pending = null; });
 
 function updateEmbed() { $('embed-code').value = embedCode($('embed-path').value, locale); }
+function setExportTab(format) {
+  for (const tab of ['html', 'png']) {
+    const selected = tab === format;
+    $(`${tab}-tab`).setAttribute('aria-selected', String(selected));
+    $(`${tab}-tab`).tabIndex = selected ? 0 : -1;
+    $(`${tab}-panel`).hidden = !selected;
+  }
+}
+for (const format of ['html', 'png']) {
+  $(`${format}-tab`).addEventListener('click', () => setExportTab(format));
+  $(`${format}-tab`).addEventListener('keydown', (event) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 'html' : event.key === 'End' ? 'png' : format === 'html' ? 'png' : 'html';
+    setExportTab(next);
+    $(`${next}-tab`).focus();
+  });
+}
 $('open-export').addEventListener('click', () => {
   cancelStroke();
   const filename = `${safeFilename(store.project.name)}.html`;
@@ -382,7 +410,34 @@ $('open-export').addEventListener('click', () => {
   $('export-object-count').textContent = t(locale, 'objectCount', { count: store.project.objects.length });
   $('embed-path').value = `/${filename}`;
   updateEmbed();
+  setExportTab('html');
+  if (!exportingImage) exportStatus = null;
+  renderExportStatus();
   $('export-dialog').showModal();
+});
+$('download-png').addEventListener('click', async () => {
+  if (exportingImage || failed || !scene) return;
+  cancelStroke();
+  const filename = `${safeFilename(store.project.name)}.png`;
+  exportingImage = true;
+  exportStatus = 'pngExporting';
+  renderExportStatus();
+  try {
+    const blob = await scene.captureImage({
+      size: Number($('image-size').value),
+      transparent: $('image-transparent').checked,
+    });
+    if (failed) throw localizedError('contextLost');
+    download(blob, filename);
+    exportStatus = 'pngExported';
+    announce('pngExported');
+  } catch {
+    exportStatus = 'pngFailed';
+    announce('pngFailed', true);
+  } finally {
+    exportingImage = false;
+    renderExportStatus();
+  }
 });
 $('embed-path').addEventListener('input', updateEmbed);
 $('copy-embed').addEventListener('click', async () => {

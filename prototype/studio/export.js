@@ -3,6 +3,21 @@ import { normalizeLocale, t } from './i18n.js';
 
 const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
+export function imageOptions(options) {
+  if (!options || ![1024, 2048].includes(options.size) || typeof options.transparent !== 'boolean') {
+    throw new Error('Invalid PNG options');
+  }
+  return { size: options.size, transparent: options.transparent };
+}
+
+export function fitImageDistance(radius, fov) {
+  if (!Number.isFinite(radius) || radius <= 0 || !Number.isFinite(fov) || fov <= 0 || fov >= 180) {
+    throw new Error('Invalid image framing');
+  }
+  const halfAngle = Math.atan(0.84 * Math.tan(fov * Math.PI / 360));
+  return radius / Math.sin(halfAngle);
+}
+
 export function safeFilename(name) {
   return String(name).normalize('NFKC').replace(/[^\p{L}\p{N}_-]+/gu, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'my-planet';
 }

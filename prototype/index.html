@@ -101,12 +101,25 @@
 
   <dialog id="export-dialog" aria-labelledby="export-title">
     <div class="dialog-heading"><h2 id="export-title" data-i18n="exportTitle">导出星球</h2><button class="icon-button" data-close="export-dialog" aria-label="关闭导出" data-i18n-label="closeExport"><i data-lucide="x"></i></button></div>
+    <div class="export-tabs" role="tablist" aria-label="导出格式" data-i18n-label="exportFormat">
+      <button id="html-tab" type="button" role="tab" aria-controls="html-panel" aria-selected="true" tabindex="0">HTML</button>
+      <button id="png-tab" type="button" role="tab" aria-controls="png-panel" aria-selected="false" tabindex="-1">PNG</button>
+    </div>
+    <div id="html-panel" role="tabpanel" aria-labelledby="html-tab">
     <div class="export-file-row"><span class="file-symbol"><i data-lucide="file-code-2"></i></span><div><strong id="export-filename">my-planet.html</strong><span data-i18n="standaloneHTML">独立 HTML</span></div><span id="export-object-count"></span></div>
     <label class="field-label" for="embed-path" data-i18n="filePath">网页中的文件路径</label>
     <input class="text-input" id="embed-path" value="/my-planet.html" maxlength="300" spellcheck="false">
     <div class="code-label"><label class="field-label" for="embed-code" data-i18n="embedCode">嵌入代码</label><button class="icon-button" id="copy-embed" aria-label="复制嵌入代码" title="复制嵌入代码" data-i18n-label="copyEmbed" data-i18n-title="copyEmbed"><i data-lucide="copy"></i></button></div>
     <textarea id="embed-code" readonly aria-label="嵌入代码" data-i18n-label="embedCode" rows="4" spellcheck="false"></textarea>
     <div class="dialog-actions"><button class="primary-button" id="download-html"><i data-lucide="download"></i><span data-i18n="downloadHTML">下载 HTML</span></button></div>
+    </div>
+    <div id="png-panel" role="tabpanel" aria-labelledby="png-tab" hidden>
+      <label class="field-label" for="image-size" data-i18n="imageSize">图片尺寸</label>
+      <select class="text-input" id="image-size"><option value="1024">1024 × 1024 px</option><option value="2048">2048 × 2048 px</option></select>
+      <label class="check-row image-transparency"><span data-i18n="transparentBackground">透明背景</span><input id="image-transparent" type="checkbox" checked></label>
+      <div class="dialog-actions"><button class="primary-button" id="download-png"><i data-lucide="download"></i><span data-i18n="downloadPNG">下载 PNG</span></button></div>
+    </div>
+    <p id="export-status" class="export-status" role="status" aria-live="polite"></p>
   </dialog>
 </body>
 </html>
