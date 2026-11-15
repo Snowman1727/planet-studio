@@ -1,13 +1,14 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES } from './model.js';
 import { createScene } from './scene.js';
 import { buildHTML, embedCode, safeFilename } from './export.js';
 import { BRUSHES } from './catalog.js';
 import { t, loadLocale, saveLocale, errorMessage, localizedError } from './i18n.js';
+import { bindNavigation } from './navigation.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -26,6 +27,7 @@ try {
 } catch { storageAvailable = false; }
 const store = createStore(initial);
 let scene;
+let navigation;
 let mode = 'tree';
 let previewing = false;
 let paused = false;
@@ -106,6 +108,8 @@ function renderError(error) {
   $('stage-loading').hidden = true;
   document.querySelectorAll('button[data-mode]').forEach((button) => { button.disabled = true; });
   $('preview').disabled = true;
+  navigation?.reset();
+  navigation?.render();
   renderExportStatus();
   announce('renderStatus', true);
 }
@@ -125,6 +129,7 @@ function refresh({ fields = false } = {}) {
   $('seed-label').textContent = `SEED · ${doc.seed}`;
   $('undo').disabled = !store.canUndo;
   $('redo').disabled = !store.canRedo;
+  navigation?.render();
   if (fields) {
     $('project-name').value = doc.name;
     $('snow-setting').checked = doc.settings.snow;
@@ -168,6 +173,23 @@ try {
   $('stage-loading').hidden = true;
   document.body.dataset.ready = 'true';
 } catch (error) { renderError(error); }
+navigation = bindNavigation(canvas, {
+  getZoom: () => store.project.view.zoom,
+  setZoom: (zoom) => {
+    scene.setZoom(zoom);
+    store.project.view.zoom = zoom;
+    persist();
+  },
+  onStart: () => {
+    const rotating = pointer && !pointer.painting;
+    cancelStroke();
+    if (rotating) store.project.view = scene.view();
+    scene?.brush(null);
+  },
+  enabled: () => !failed,
+  outButton: $('zoom-out'), inButton: $('zoom-in'), resetButton: $('zoom-reset'),
+  resetLabel: (percent) => t(locale, 'resetZoomValue', { percent }),
+});
 refresh({ fields: true });
 if (recovered) { setSaveState('localDraft'); if (!failed) announce('recovered'); }
 else if (!storageAvailable && !failed) announce('recoveryUnavailable', true);
@@ -343,6 +365,7 @@ function saveJSON() {
 }
 $('save-project').addEventListener('click', saveJSON);
 function replaceProject(next) {
+  navigation.reset();
   cancelStroke();
   store.replace(next);
   scene?.setView(store.project.view);
@@ -467,6 +490,7 @@ const dispose = () => {
   clearTimeout(storageTimer);
   flushRecovery();
   motion.removeEventListener('change', updatePlaybackControl);
+  navigation.dispose();
   scene?.dispose();
   urls.forEach((url) => URL.revokeObjectURL(url));
 };

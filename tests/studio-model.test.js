@@ -187,7 +187,7 @@ test('legacy projects migrate to snow without changing final poses', () => {
   assert.equal(migrated.version, 2);
   assert.deepEqual(migrated.settings, { environment: 'snow', snow: false, autoRotate: true });
   assert.deepEqual(migrated.objects, legacy.objects);
-  assert.deepEqual(migrated.view, legacy.view);
+  assert.deepEqual(migrated.view, { ...legacy.view, zoom: 1 });
 });
 
 test('new projects and all three environments survive exact saves', () => {

@@ -4,6 +4,7 @@ import { BRUSHES, ENVIRONMENTS } from './catalog.js';
 import { createAssets } from './assets.js';
 import { localizedError } from './i18n.js';
 import { imageOptions, fitImageDistance } from './export.js';
+import { cameraDistance, clampZoom } from './view.js';
 
 const RADIUS = 2.08;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -37,6 +38,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   let previous = performance.now();
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const target = { ...doc.view };
+  target.zoom = clampZoom(target.zoom);
   world.rotation.set(target.x, target.y, -0.04);
 
   const ambient = new THREE.HemisphereLight(0xd6fff2, 0x223342, 2.5);
@@ -200,7 +202,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
     const width = canvas.clientWidth || 1;
     const height = canvas.clientHeight || 1;
     camera.aspect = width / height;
-    camera.position.z = Math.max(9.7, 9.2 / camera.aspect);
+    camera.position.z = cameraDistance(camera.aspect, target.zoom);
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
     dirty = true;
@@ -259,6 +261,8 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
     setView(view) {
       target.x = view.x;
       target.y = view.y;
+      target.zoom = clampZoom(view.zoom);
+      camera.position.z = cameraDistance(camera.aspect, target.zoom);
       world.rotation.x = target.x;
       world.rotation.y = target.y;
       dirty = true;
@@ -282,7 +286,12 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       target.x = THREE.MathUtils.clamp(target.x + dy, -1.5, 1.5);
       dirty = true;
     },
-    view() { return { x: target.x, y: target.y }; },
+    setZoom(zoom) {
+      target.zoom = clampZoom(zoom);
+      camera.position.z = cameraDistance(camera.aspect, target.zoom);
+      dirty = true;
+    },
+    view() { return { x: target.x, y: target.y, zoom: target.zoom }; },
     async captureImage(options) {
       const { size, transparent } = imageOptions(options);
       if (disposed || !contextAvailable) throw localizedError('contextLost');

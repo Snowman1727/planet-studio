@@ -112,12 +112,19 @@ your composition, saved view or undo history.
 | Paint or erase | Drag on the globe with the selected brush |
 | Rotate | Select the rotation tool, then drag |
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
+| Zoom | Wheel over the canvas, pinch with two fingers, or use the zoom buttons |
+| Keyboard zoom / reset | + / - / 0 while the canvas is focused; click the percentage to reset |
 | Stamp a brush | Enter while the canvas is focused |
 | Cancel the current stroke | Escape |
 | Undo | Cmd/Ctrl + Z |
 | Redo | Cmd/Ctrl + Shift + Z |
 
 Undo and redo shortcuts apply outside text inputs.
+
+Zoom ranges from **65% to 180%** and is saved in JSON, local drafts and HTML
+players. Starting a pinch or wheel gesture cancels an unfinished brush stroke;
+lifting one finger after pinching does not resume painting. Zoom does not add
+undo steps. PNG export still fits the whole planet, regardless of editor zoom.
 
 ## Development
 
@@ -161,6 +168,9 @@ tests/                 Model, geometry, and export tests
 - Projects are saved as schema version **2**. Version **1** projects import
   as snow worlds while retaining their objects and view; older editors cannot
   read the new format.
+- `view.zoom` is an optional schema 2 field. Older schema 1/2 files without it
+  open at 100%; explicit invalid values are rejected. Older schema 2 editors
+  may discard zoom when saving.
 - Snowfall preferences are preserved across environments and take effect
   when returning to snow.
 

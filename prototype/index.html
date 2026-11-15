@@ -87,6 +87,11 @@
       <canvas id="studio-canvas" tabindex="0" aria-label="三维星球画布" data-i18n-label="canvas"></canvas>
       <div class="stage-loading" id="stage-loading"><span class="loading-line"></span></div>
       <p class="scene-error" id="scene-error" role="alert" hidden></p>
+      <div class="zoom-controls" role="group" aria-label="镜头缩放" data-i18n-label="cameraZoom">
+        <button class="icon-button" id="zoom-out" aria-label="缩小" title="缩小" data-i18n-label="zoomOut" data-i18n-title="zoomOut"><i data-lucide="zoom-out"></i></button>
+        <button id="zoom-reset" class="zoom-value" aria-label="重置缩放" title="重置缩放" data-i18n-label="resetZoom" data-i18n-title="resetZoom">100%</button>
+        <button class="icon-button" id="zoom-in" aria-label="放大" title="放大" data-i18n-label="zoomIn" data-i18n-title="zoomIn"><i data-lucide="zoom-in"></i></button>
+      </div>
       <div class="stage-bottom"><span id="seed-label">SEED · 1727</span><span id="scene-detail">空白星球</span></div>
     </section>
   </main>

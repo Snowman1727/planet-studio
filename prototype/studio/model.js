@@ -1,4 +1,5 @@
 import { localizedError } from './i18n.js';
+import { MIN_ZOOM, MAX_ZOOM } from './view.js';
 
 export const MAX_OBJECTS = 2000;
 export const MAX_FILE_BYTES = 2 * 1024 * 1024;
@@ -14,7 +15,7 @@ export function createProject(seed = 1727) {
   return {
     version: 2, generator: 1, name: '未命名星球', seed: seed >>> 0,
     settings: { environment: 'snow', snow: true, autoRotate: true },
-    view: { x: 0.12, y: -0.2 },
+    view: { x: 0.12, y: -0.2, zoom: 1 },
     objects: [],
   };
 }
@@ -33,6 +34,8 @@ export function parseProject(text) {
       !bounded(doc.view?.x, -1.5, 1.5) || !bounded(doc.view?.y, -100000, 100000)) fail();
   const environment = doc.version === 1 ? 'snow' : doc.settings.environment;
   if (typeof environment !== 'string' || !Object.hasOwn(ENVIRONMENTS, environment)) fail();
+  const zoom = Object.hasOwn(doc.view, 'zoom') ? doc.view.zoom : 1;
+  if (!bounded(zoom, MIN_ZOOM, MAX_ZOOM)) fail();
   const ids = new Set();
   const objects = doc.objects.map((object) => {
     if (!object || typeof object.id !== 'string' || !/^[\w:-]{1,64}$/.test(object.id) ||
@@ -48,7 +51,7 @@ export function parseProject(text) {
   return {
     version: 2, generator: 1, name: doc.name, seed: doc.seed,
     settings: { environment, snow: doc.settings.snow, autoRotate: doc.settings.autoRotate },
-    view: { x: doc.view.x, y: doc.view.y }, objects,
+    view: { x: doc.view.x, y: doc.view.y, zoom }, objects,
   };
 }
 
