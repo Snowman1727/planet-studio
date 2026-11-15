@@ -74,5 +74,7 @@ day03-live-mobile-zh.png
 
 线上 Chromium 另通过 10 项断言：SHA 精确匹配、桌面和手机真实 WebGL
 画面、放大后像素轮廓变化、刷新后恢复缩放、中文与英文的可访问比例、
-键盘重置，以及没有未捕获 JavaScript 错误。本文及进度记录作为后续
-文档提交，还需通过同一工作流并确认部署。
+键盘重置，以及没有未捕获 JavaScript 错误。本文及进度记录随后由
+`6d9db3555ed821417d3176a2ae2f1e32123c5a38` 提交；其
+<https://github.com/Snowman1727/planet-studio/actions/runs/43668626787>
+同样成功，线上发布标记精确匹配该文档提交。
