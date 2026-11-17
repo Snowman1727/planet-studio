@@ -35,6 +35,7 @@ for a personal website, portfolio, or creative experiment.
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
+| **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
 | **Portable creations** | Download a 1024/2048 square PNG with a transparent or dark background, or export a self-contained, interactive HTML file for offline use and embedding. |
 
 ## Create Your Planet
@@ -68,7 +69,7 @@ language. Switching languages never changes your planet or its name.
 ### Keep an Editable Copy
 
 Save your planet as **JSON** to preserve its objects, positions, orientations,
-sizes, environment, and view. Import it to continue working later.
+sizes, environment, current view, and saved views. Import it to continue working later.
 
 Local draft recovery uses browser storage. Download JSON for projects you
 want to keep, since clearing browser data also removes the local draft.
@@ -95,6 +96,7 @@ The viewer does not load a CDN or contact the editor server. Your host page
 must allow iframes; strict content security policies may also need to allow
 the exported file's inline scripts. HTML is a presentation file, not a
 replacement for an editable JSON project.
+If the project has saved views, the viewer offers a menu to jump between them.
 
 ### Save a Picture
 
@@ -114,6 +116,7 @@ your composition, saved view or undo history.
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
 | Zoom | Wheel over the canvas, pinch with two fingers, or use the zoom buttons |
 | Keyboard zoom / reset | + / - / 0 while the canvas is focused; click the percentage to reset |
+| Save and revisit views | Open the bookmark button beside Preview, name the current view, then select or delete it |
 | Stamp a brush | Enter while the canvas is focused |
 | Cancel the current stroke | Escape |
 | Undo | Cmd/Ctrl + Z |
@@ -125,6 +128,8 @@ Zoom ranges from **65% to 180%** and is saved in JSON, local drafts and HTML
 players. Starting a pinch or wheel gesture cancels an unfinished brush stroke;
 lifting one finger after pinching does not resume painting. Zoom does not add
 undo steps. PNG export still fits the whole planet, regardless of editor zoom.
+Each project can store up to **eight** named views. They include both orientation
+and zoom, survive JSON and local draft recovery, and do not use undo steps.
 
 ## Development
 
@@ -171,6 +176,8 @@ tests/                 Model, geometry, and export tests
 - `view.zoom` is an optional schema 2 field. Older schema 1/2 files without it
   open at 100%; explicit invalid values are rejected. Older schema 2 editors
   may discard zoom when saving.
+- `bookmarks` is an optional schema 2 list. Older schema 1/2 files open with an
+  empty list; invalid names, camera values or over-eight lists are rejected.
 - Snowfall preferences are preserved across environments and take effect
   when returning to snow.
 

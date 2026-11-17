@@ -1,6 +1,6 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2 } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
-import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES } from './model.js';
+import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
 import { buildHTML, embedCode, safeFilename } from './export.js';
 import { BRUSHES } from './catalog.js';
@@ -8,7 +8,7 @@ import { t, loadLocale, saveLocale, errorMessage, localizedError } from './i18n.
 import { bindNavigation } from './navigation.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2 } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -38,6 +38,7 @@ let statusState = { key: 'ready', error: false, params: {} };
 let saveState = 'newWork';
 let exportingImage = false;
 let exportStatus = null;
+let bookmarkFeedback = null;
 let pending = null;
 let storageTimer;
 let recoverySnapshot = null;
@@ -92,6 +93,42 @@ function renderLanguage() {
   renderStatus();
   updateEmbed();
   renderExportStatus();
+  renderBookmarkDialog();
+}
+function renderBookmarkDialog() {
+  const bookmarks = store.project.bookmarks;
+  $('bookmark-count').textContent = t(locale, 'savedViewCount', { count: bookmarks.length });
+  $('bookmark-empty').hidden = bookmarks.length > 0;
+  $('bookmark-name').disabled = bookmarks.length >= BOOKMARK_LIMIT || failed;
+  $('save-bookmark').disabled = bookmarks.length >= BOOKMARK_LIMIT || failed;
+  $('bookmark-feedback').textContent = bookmarkFeedback ? t(locale, bookmarkFeedback.key) : '';
+  $('bookmark-feedback').dataset.error = String(Boolean(bookmarkFeedback?.error));
+  const list = $('bookmark-list');
+  list.replaceChildren();
+  bookmarks.forEach((bookmark, index) => {
+    const row = document.createElement('li');
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'bookmark-go';
+    go.dataset.bookmarkGo = String(index);
+    go.setAttribute('aria-label', t(locale, 'jumpToView', { name: bookmark.name }));
+    const name = document.createElement('span');
+    name.textContent = bookmark.name;
+    const zoom = document.createElement('small');
+    zoom.textContent = `${Math.round(bookmark.view.zoom * 100)}%`;
+    go.append(name, zoom);
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'icon-button';
+    remove.dataset.bookmarkDelete = String(index);
+    remove.setAttribute('aria-label', t(locale, 'deleteView', { name: bookmark.name }));
+    remove.title = t(locale, 'deleteView', { name: bookmark.name });
+    remove.innerHTML = '<i data-bookmark-icon="trash-2"></i>';
+    remove.disabled = failed;
+    row.append(go, remove);
+    list.append(row);
+  });
+  createIcons({ icons: { Trash2 }, nameAttr: 'data-bookmark-icon' });
 }
 function renderExportStatus() {
   $('export-status').textContent = exportStatus ? t(locale, exportStatus) : '';
@@ -108,6 +145,8 @@ function renderError(error) {
   $('stage-loading').hidden = true;
   document.querySelectorAll('button[data-mode]').forEach((button) => { button.disabled = true; });
   $('preview').disabled = true;
+  $('open-bookmarks').disabled = true;
+  renderBookmarkDialog();
   navigation?.reset();
   navigation?.render();
   renderExportStatus();
@@ -306,6 +345,58 @@ function setPreview(value) {
   if (!value && scene) { store.project.view = scene.view(); persist(); }
 }
 $('preview').addEventListener('click', () => setPreview(!previewing));
+$('open-bookmarks').addEventListener('click', () => {
+  cancelStroke();
+  scene?.brush(null);
+  if (previewing) {
+    scene?.freeze();
+    setPreview(false);
+  }
+  bookmarkFeedback = null;
+  renderBookmarkDialog();
+  $('bookmarks-dialog').showModal();
+  if (!$('bookmark-name').disabled) $('bookmark-name').focus();
+});
+$('bookmark-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  cancelStroke();
+  try {
+    store.addBookmark($('bookmark-name').value, scene?.view() ?? store.project.view);
+    $('bookmark-name').value = '';
+    bookmarkFeedback = { key: 'bookmarkSaved', error: false };
+    persist();
+    announce('bookmarkSaved');
+  } catch (error) {
+    const key = ['invalidBookmark', 'bookmarkDuplicate', 'bookmarkLimit'].includes(error?.code) ? error.code : 'invalidBookmark';
+    bookmarkFeedback = { key, error: true };
+    announce(key, true);
+  }
+  renderBookmarkDialog();
+});
+$('bookmark-list').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-bookmark-go],button[data-bookmark-delete]');
+  if (!button) return;
+  const index = Number(button.dataset.bookmarkGo ?? button.dataset.bookmarkDelete);
+  const bookmark = store.project.bookmarks[index];
+  if (!bookmark) return;
+  if (button.hasAttribute('data-bookmark-delete')) {
+    store.removeBookmark(index);
+    bookmarkFeedback = { key: 'bookmarkDeleted', error: false };
+    persist();
+    renderBookmarkDialog();
+    $('bookmark-name').focus();
+    announce('bookmarkDeleted');
+    return;
+  }
+  cancelStroke();
+  scene?.setView(bookmark.view);
+  store.project.view = { ...bookmark.view };
+  navigation.render();
+  persist();
+  $('bookmarks-dialog').close();
+  canvas.focus({ preventScroll: true });
+  announce('bookmarkLoaded', false, { name: bookmark.name });
+});
 $('pause-preview').addEventListener('click', () => {
   paused = !paused;
   scene?.pause(paused);
@@ -370,6 +461,8 @@ function replaceProject(next) {
   store.replace(next);
   scene?.setView(store.project.view);
   refresh({ fields: true });
+  bookmarkFeedback = null;
+  renderBookmarkDialog();
   persist();
   announce('planetLoaded');
 }

@@ -81,6 +81,7 @@
         <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span><span class="scene-divider">/</span><span id="environment-label">雪原</span></div>
         <div class="view-actions">
           <button class="icon-button" id="pause-preview" aria-label="暂停动画" title="暂停动画" hidden><i data-lucide="pause"></i></button>
+          <button class="icon-button" id="open-bookmarks" aria-label="视角收藏" title="视角收藏" data-i18n-label="savedViews" data-i18n-title="savedViews"><i data-lucide="bookmark"></i></button>
           <button class="secondary-button" id="preview" aria-pressed="false"><i data-lucide="eye"></i><span id="preview-label">预览</span></button>
         </div>
       </div>
@@ -102,6 +103,18 @@
     <div class="dialog-heading"><h2 id="replace-title" data-i18n="replaceTitle">替换当前星球？</h2><button class="icon-button" data-close="replace-dialog" aria-label="取消替换" data-i18n-label="cancelReplace"><i data-lucide="x"></i></button></div>
     <p class="dialog-description" data-i18n="replaceDescription">当前作品尚未导出 JSON。</p>
     <div class="dialog-actions"><button class="secondary-button" id="save-before-replace"><i data-lucide="save"></i><span data-i18n="saveFirst">先保存 JSON</span></button><button class="danger-button" id="confirm-replace" data-i18n="replace">替换</button></div>
+  </dialog>
+
+  <dialog id="bookmarks-dialog" aria-labelledby="bookmarks-title">
+    <div class="dialog-heading"><h2 id="bookmarks-title" data-i18n="savedViews">视角收藏</h2><button class="icon-button" data-close="bookmarks-dialog" aria-label="关闭视角收藏" data-i18n-label="closeSavedViews" title="关闭视角收藏" data-i18n-title="closeSavedViews"><i data-lucide="x"></i></button></div>
+    <form id="bookmark-form" class="bookmark-form">
+      <label class="field-label" for="bookmark-name" data-i18n="viewName">视角名称</label>
+      <div class="bookmark-entry"><input class="text-input" id="bookmark-name" maxlength="40" autocomplete="off"><button class="primary-button" id="save-bookmark" type="submit"><i data-lucide="bookmark-plus"></i><span data-i18n="saveView">收藏当前视角</span></button></div>
+    </form>
+    <div class="bookmark-summary"><span id="bookmark-count"></span></div>
+    <p id="bookmark-empty" class="bookmark-empty" data-i18n="noSavedViews">还没有收藏视角。</p>
+    <ul id="bookmark-list" class="bookmark-list" aria-label="视角收藏" data-i18n-label="savedViews"></ul>
+    <p id="bookmark-feedback" class="export-status" role="status" aria-live="polite"></p>
   </dialog>
 
   <dialog id="export-dialog" aria-labelledby="export-title">

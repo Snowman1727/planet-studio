@@ -7,6 +7,7 @@ createIcons({ icons: { ZoomIn, ZoomOut } });
 const locale = normalizeLocale(document.documentElement.lang);
 const canvas = document.querySelector('#planet-player');
 const button = document.querySelector('#player-pause');
+const views = document.querySelector('#player-views');
 const error = document.querySelector('#player-error');
 let scene;
 let navigation;
@@ -21,6 +22,7 @@ function showError(reason) {
   error.hidden = false;
   error.textContent = errorMessage(reason, locale, 'playerUnavailable');
   button.hidden = true;
+  views.disabled = true;
 }
 try {
   const project = JSON.parse(document.querySelector('#planet-data').textContent);
@@ -46,6 +48,16 @@ try {
   update();
   motion.addEventListener('change', update);
   button.addEventListener('click', () => { paused = !paused; scene.pause(paused); update(); });
+  views.addEventListener('change', () => {
+    const bookmark = project.bookmarks[Number(views.value)];
+    if (!bookmark || failed) return;
+    paused = true;
+    scene.pause(true);
+    scene.setView(bookmark.view);
+    navigation.render();
+    update();
+    views.value = '';
+  });
   canvas.addEventListener('pointerdown', (event) => {
     if (failed || pointer || event.button !== 0) return;
     pointer = { id: event.pointerId, x: event.clientX, y: event.clientY };

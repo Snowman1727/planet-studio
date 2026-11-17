@@ -4,18 +4,22 @@ import { MIN_ZOOM, MAX_ZOOM } from './view.js';
 export const MAX_OBJECTS = 2000;
 export const MAX_FILE_BYTES = 2 * 1024 * 1024;
 export const HISTORY_LIMIT = 40;
+export const BOOKMARK_LIMIT = 8;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const angle = (a, b) => Math.acos(clamp(dot(a, b), -1, 1));
 const clone = (value) => structuredClone(value);
 const fail = () => { throw localizedError('invalidProject'); };
 const bounded = (value, min, max) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+const validBookmarkView = (view) => view && bounded(view.x, -1.5, 1.5) &&
+  bounded(view.y, -100000, 100000) && bounded(view.zoom, MIN_ZOOM, MAX_ZOOM);
 
 export function createProject(seed = 1727) {
   return {
     version: 2, generator: 1, name: '未命名星球', seed: seed >>> 0,
     settings: { environment: 'snow', snow: true, autoRotate: true },
     view: { x: 0.12, y: -0.2, zoom: 1 },
+    bookmarks: [],
     objects: [],
   };
 }
@@ -36,6 +40,18 @@ export function parseProject(text) {
   if (typeof environment !== 'string' || !Object.hasOwn(ENVIRONMENTS, environment)) fail();
   const zoom = Object.hasOwn(doc.view, 'zoom') ? doc.view.zoom : 1;
   if (!bounded(zoom, MIN_ZOOM, MAX_ZOOM)) fail();
+  const rawBookmarks = Object.hasOwn(doc, 'bookmarks') ? doc.bookmarks : [];
+  if (!Array.isArray(rawBookmarks) || rawBookmarks.length > BOOKMARK_LIMIT) fail();
+  const bookmarkNames = new Set();
+  const bookmarks = rawBookmarks.map((bookmark) => {
+    if (!bookmark || typeof bookmark.name !== 'string' ||
+        !bookmark.name.length || bookmark.name.length > 40 ||
+        bookmark.name.trim() !== bookmark.name || !validBookmarkView(bookmark.view)) fail();
+    const key = bookmark.name.toLowerCase();
+    if (bookmarkNames.has(key)) fail();
+    bookmarkNames.add(key);
+    return { name: bookmark.name, view: { x: bookmark.view.x, y: bookmark.view.y, zoom: bookmark.view.zoom } };
+  });
   const ids = new Set();
   const objects = doc.objects.map((object) => {
     if (!object || typeof object.id !== 'string' || !/^[\w:-]{1,64}$/.test(object.id) ||
@@ -51,7 +67,7 @@ export function parseProject(text) {
   return {
     version: 2, generator: 1, name: doc.name, seed: doc.seed,
     settings: { environment, snow: doc.settings.snow, autoRotate: doc.settings.autoRotate },
-    view: { x: doc.view.x, y: doc.view.y, zoom }, objects,
+    view: { x: doc.view.x, y: doc.view.y, zoom }, bookmarks, objects,
   };
 }
 
@@ -175,6 +191,25 @@ export function createStore(initial) {
     get active() { return Boolean(stroke); },
     get canUndo() { return past.length > 0; },
     get canRedo() { return future.length > 0; },
+    addBookmark(name, view) {
+      if (typeof name !== 'string' || !name.trim() || name.trim().length > 40 || !validBookmarkView(view)) {
+        throw localizedError('invalidBookmark');
+      }
+      const trimmed = name.trim();
+      if (project.bookmarks.some((bookmark) => bookmark.name.toLowerCase() === trimmed.toLowerCase())) {
+        throw localizedError('bookmarkDuplicate');
+      }
+      if (project.bookmarks.length >= BOOKMARK_LIMIT) throw localizedError('bookmarkLimit');
+      cancel();
+      project.bookmarks.push({ name: trimmed, view: { x: view.x, y: view.y, zoom: view.zoom } });
+      return true;
+    },
+    removeBookmark(index) {
+      if (!Number.isInteger(index) || index < 0 || index >= project.bookmarks.length) return false;
+      cancel();
+      project.bookmarks.splice(index, 1);
+      return true;
+    },
     begin(type, radius, density) {
       if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1)) {
         throw localizedError('invalidBrush');
