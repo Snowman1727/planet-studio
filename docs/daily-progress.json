@@ -35,7 +35,16 @@
       "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/43662007528",
       "report": "docs/daily-reports/day-03.md"
     },
-    { "day": 4, "scheduledDate": "2026-11-15", "feature": "视角收藏", "status": "pending" },
+    {
+      "day": 4,
+      "scheduledDate": "2026-11-15",
+      "feature": "视角收藏",
+      "status": "published",
+      "completedDate": "2026-11-17",
+      "commit": "600eae0fe40ce55cd1040df53c620bc090fb7793",
+      "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/43992526795",
+      "report": "docs/daily-reports/day-04.md"
+    },
     { "day": 5, "scheduledDate": "2026-11-16", "feature": "示例模板库", "status": "pending" },
     { "day": 6, "scheduledDate": "2026-11-17", "feature": "本地作品库", "status": "pending" },
     { "day": 7, "scheduledDate": "2026-11-18", "feature": "按类型擦除", "status": "pending" },

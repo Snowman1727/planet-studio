@@ -45,9 +45,9 @@
 - [x] Run Node.js 24 full `npm test`, `npm run build`, and `git diff --check`.
 - [x] Verify production build in Playwright on desktop/mobile, narrow/landscape and both locales: real WebGL, save/jump/delete, capacity/error states, JSON, legacy import, recovery, undo/redo, PNG, and downloaded offline HTML with network blocked.
 - [x] Review the whole feature and address blocking issues with regression evidence.
-- [ ] Commit with the authorized noreply identity; fetch and normally push main.
-- [ ] Wait for successful `Test and deploy`, check exact feature SHA in live `release.json`, then verify the online feature in a real browser.
-- [ ] Only afterward mark Day 04 `published`, write the report, commit records and confirm their deployment.
+- [x] Commit with the authorized noreply identity; fetch and normally push main.
+- [x] Wait for successful `Test and deploy`, check exact feature SHA in live `release.json`, then verify the online feature in a real browser.
+- [x] Only afterward mark Day 04 `published`, write the report, commit records and confirm their deployment.
 
 ## Execution Ledger
 
@@ -57,3 +57,4 @@
 - Browser QA found repeated Lucide warnings when rebuilding list icons. Scoped dynamic icon replacement to `data-bookmark-icon`, then reran the production build and 61 main browser checks without console warnings or errors.
 - Final local production verification: 52/52 unit tests; Vite build success with existing bundle-size warning; `git diff --check` clean. Playwright: 61 primary assertions, 12 brush-history/preview assertions and four context-loss/JSON-rescue assertions. Real WebGL checked at 1440×960, 390×844, 360×640 and 844×390; EN/ZH, schema 1/2, JSON download/import, recovery and downloaded HTML with all HTTP(S) blocked. Visually inspected mobile, landscape and offline-player screenshots.
 - 2026-11-17 review: remote main remains at the clean base. Reviewed model validation, history, HTML escaping, editor/player controls and failure states. Found that the standalone player's native select could not choose the same bookmark again after changing the camera. Reproduced the selected-value failure in Playwright, reset the placeholder after each jump, then rebuilt and verified repeat selection, 52/52 unit tests, 61 production-browser checks and clean diff. No blocking issue remains.
+- Feature commit `600eae0fe40ce55cd1040df53c620bc090fb7793` was pushed normally and `Test and deploy` run 43992526795 passed build, deploy and verify. Live release marker matched that exact SHA. Live Chromium passed 10 checks covering WebGL, desktop/mobile layout, saved-view navigation, JSON and recovery with zero console errors; screenshots are in ignored `output/playwright/`. The report and progress entry record the delayed 2026-11-17 publication; Day 05 was not started.
