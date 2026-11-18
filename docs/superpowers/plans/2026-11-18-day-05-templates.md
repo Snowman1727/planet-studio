@@ -37,8 +37,8 @@
 - [x] Run Node.js 24 full `npm test`, `npm run build` and `git diff --check`.
 - [x] Verify production build in Playwright on desktop/mobile: picker, all three real WebGL worlds, confirm/cancel/save-first, edit/undo/redo, JSON and local recovery, old JSON, PNG, downloaded offline HTML with network blocked, console and screenshots.
 - [x] Review whole feature and address important issues with regression evidence.
-- [ ] Commit only Day 05 files and normally push `main`.
-- [ ] Wait for successful `Test and deploy`, exact live feature SHA, and online browser checks; only then mark `published`, write Day 05 report and confirm report deployment.
+- [x] Commit only Day 05 files and normally push `main`.
+- [x] Wait for successful `Test and deploy`, exact live feature SHA, and online browser checks; only then mark `published`, write Day 05 report and confirm report deployment.
 
 ## Execution Ledger
 
@@ -47,3 +47,4 @@
 - RED: `tests/studio-templates.test.js` failed for missing `templates.js`; first GREEN: 3/3 feature tests. Forest, village and desert yield 69, 46 and 32 collision-free objects, respectively. The desert cabin was moved from the rim to the visible front after inspecting actual renderer captures.
 - Visual assets are 2x PNG crops of the actual 1200×900 local WebGL canvas, not invented template art. Pickers were inspected at 390×844 and 360×640, with desktop and landscape screenshots also retained under ignored `output/playwright/`.
 - Final local production QA: 44 Playwright checks cover all templates, English/Chinese, image loading, unsaved-work cancellation and save-first, editing/undo/redo, preview exit, schema 1 import, JSON reimport, local recovery, actual opened PNG pixels, downloaded network-blocked HTML with changed WebGL pixels, desktop/mobile/narrow/landscape rendering and no console errors. Whole-feature review found no blocking issue.
+- Feature commit `c157158a44c64bd55d62d0d8e50d9e333cb3e140` was normally pushed to `main`; `Test and deploy` run 44224558864 passed build, deploy and verify. Live `release.json` matched that exact SHA. Live Chromium passed 15 checks for thumbnails, all three WebGL worlds, editing, JSON, recovery and mobile layout with zero JS/console errors; online desktop/mobile screenshots are in ignored `output/playwright/`. Day 06 was not started.
