@@ -149,6 +149,14 @@ dialog::backdrop { background: #0009; }
 .export-status:not(:empty) { margin-top: 16px; }
 .export-status[data-error="true"] { color: var(--coral); }
 .dialog-description { color: var(--muted); font-size: 13px; margin: 8px 0 28px; line-height: 1.7; }
+.template-list { display: grid; gap: 8px; }
+.template-option { width: 100%; min-height: 78px; padding: 0 10px 0 0; gap: 14px; text-align: left; border-color: var(--line); background: var(--background); overflow: hidden; }
+.template-option:not(:disabled):hover, .template-option:focus-visible { border-color: var(--accent); }
+.template-option img { width: 88px; height: 78px; flex-shrink: 0; object-fit: cover; background: var(--raised); }
+.template-option span { display: grid; gap: 5px; min-width: 0; flex: 1; }
+.template-option strong { font-size: 12px; font-weight: 500; }
+.template-option small { font-size: 10px; line-height: 1.4; color: var(--muted); }
+.template-option > svg { width: 16px; height: 16px; color: var(--muted); }
 .bookmark-form .field-label { margin-bottom: 8px; }
 .bookmark-entry { display: flex; gap: 8px; }
 .bookmark-entry .text-input { min-width: 0; flex: 1; }
@@ -200,6 +208,8 @@ body[data-preview="true"] .scene-label .status-dot { background: var(--coral); }
   #language-setting { width: 77px; height: 30px; }
   .history-actions { margin-right: auto; padding-right: 8px; }
   .top-actions .icon-button { width: 32px; height: 30px; }
+  .template-option { gap: 9px; }
+  .template-option img { width: 76px; }
   .primary-button, .secondary-button { min-height: 30px; padding: 5px 10px; }
   .workspace { flex-direction: column-reverse; }
   .toolpanel { width: 100%; height: min(280px, 44svh); flex-shrink: 0; border-right: 0; border-top: 1px solid var(--line); padding: 9px 12px 12px; display: block; overflow-y: auto; }

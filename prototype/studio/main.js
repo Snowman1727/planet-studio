@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2 } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -6,9 +6,10 @@ import { buildHTML, embedCode, safeFilename } from './export.js';
 import { BRUSHES } from './catalog.js';
 import { t, loadLocale, saveLocale, errorMessage, localizedError } from './i18n.js';
 import { bindNavigation } from './navigation.js';
+import { createTemplate } from './templates.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2 } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -458,6 +459,7 @@ $('save-project').addEventListener('click', saveJSON);
 function replaceProject(next) {
   navigation.reset();
   cancelStroke();
+  if (previewing) setPreview(false);
   store.replace(next);
   scene?.setView(store.project.view);
   refresh({ fields: true });
@@ -477,6 +479,18 @@ $('new-project').addEventListener('click', () => {
   const seed = crypto.getRandomValues(new Uint32Array(1))[0];
   const next = createProject(seed);
   next.name = t(locale, 'untitled');
+  requestReplace(next);
+});
+$('open-templates').addEventListener('click', () => {
+  cancelStroke();
+  scene?.brush(null);
+  $('templates-dialog').showModal();
+});
+$('templates-dialog').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-template]');
+  if (!button) return;
+  const next = createTemplate(button.dataset.template, locale);
+  $('templates-dialog').close();
   requestReplace(next);
 });
 $('confirm-replace').addEventListener('click', () => {

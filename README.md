@@ -31,6 +31,7 @@ for a personal website, portfolio, or creative experiment.
 | | What you can create |
 | --- | --- |
 | **Region brushes** | Paint pine forests, cabins, broadleaf trees, flower patches, rocks, and mushrooms. Adjust brush radius and density to shape each area. |
+| **Example templates** | Start from a woodland garden, hillside village, or dune outpost. Every object remains editable. |
 | **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
@@ -40,7 +41,7 @@ for a personal website, portfolio, or creative experiment.
 
 ## Create Your Planet
 
-1. **Start with a blank globe.** Choose snow, grassland, or desert as its environment.
+1. **Start with a blank globe or template.** Open the template button in the toolbar to load a forest, village, or desert composition; replacing unsaved work asks for confirmation. You can also start blank and choose snow, grassland, or desert.
 2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
 3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. Switching environments preserves the arrangement.
 4. **Save and share.** Save JSON to keep editing later. Export HTML when your planet is ready to display.
@@ -112,6 +113,7 @@ your composition, saved view or undo history.
 | Action | Control |
 | --- | --- |
 | Paint or erase | Drag on the globe with the selected brush |
+| Open example templates | Click the template icon in the top toolbar, then choose a world |
 | Rotate | Select the rotation tool, then drag |
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
 | Zoom | Wheel over the canvas, pinch with two fingers, or use the zoom buttons |
