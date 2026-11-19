@@ -55,7 +55,16 @@
       "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/44224558864",
       "report": "docs/daily-reports/day-05.md"
     },
-    { "day": 6, "scheduledDate": "2026-11-17", "feature": "本地作品库", "status": "pending" },
+    {
+      "day": 6,
+      "scheduledDate": "2026-11-17",
+      "feature": "本地作品库",
+      "status": "published",
+      "completedDate": "2026-11-19",
+      "commit": "294693d4cb66acad38530e60baca8efabc74a09c",
+      "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/44445716616",
+      "report": "docs/daily-reports/day-06.md"
+    },
     { "day": 7, "scheduledDate": "2026-11-18", "feature": "按类型擦除", "status": "pending" },
     { "day": 8, "scheduledDate": "2026-11-19", "feature": "单个物件编辑", "status": "pending" },
     { "day": 9, "scheduledDate": "2026-11-20", "feature": "物件锁定", "status": "pending" },
