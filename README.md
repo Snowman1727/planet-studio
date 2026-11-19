@@ -35,6 +35,7 @@ for a personal website, portfolio, or creative experiment.
 | **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
+| **Local library** | Keep multiple planets in your browser. Open, rename, duplicate and delete saved projects, with confirmation before deletion. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
 | **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
 | **Portable creations** | Download a 1024/2048 square PNG with a transparent or dark background, or export a self-contained, interactive HTML file for offline use and embedding. |
@@ -44,7 +45,7 @@ for a personal website, portfolio, or creative experiment.
 1. **Start with a blank globe or template.** Open the template button in the toolbar to load a forest, village, or desert composition; replacing unsaved work asks for confirmation. You can also start blank and choose snow, grassland, or desert.
 2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
 3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. Switching environments preserves the arrangement.
-4. **Save and share.** Save JSON to keep editing later. Export HTML when your planet is ready to display.
+4. **Save and share.** Save to the local library or download JSON to keep editing later. Export HTML when your planet is ready to display.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom
 tool panel to reach all brushes and environment settings.
@@ -72,8 +73,20 @@ language. Switching languages never changes your planet or its name.
 Save your planet as **JSON** to preserve its objects, positions, orientations,
 sizes, environment, current view, and saved views. Import it to continue working later.
 
-Local draft recovery uses browser storage. Download JSON for projects you
-want to keep, since clearing browser data also removes the local draft.
+The library button opens your local projects. **Save project** updates the
+entry opened in this session; **Save as new** creates an independent project.
+Library saves are explicit, separate from the automatic recovery draft.
+After reloading, the recovered draft saves as a new entry rather than
+silently overwriting an existing project. Renaming or deleting a saved entry
+does not discard unsaved canvas edits.
+
+The library and draft belong to this browser and site, not an account.
+Clearing site data removes them; private browsing or storage limits can prevent
+saving. Failures leave existing entries intact and show a backup warning.
+Download JSON for projects you want to keep or move to another device.
+Library writes use Web Locks to prevent cross-tab lost updates, and require
+a supporting browser over HTTPS or localhost. Without safe locking, projects
+can still be opened and exported as JSON, but library writes are refused.
 
 ### Take Your World to the Web
 
@@ -114,6 +127,7 @@ your composition, saved view or undo history.
 | --- | --- |
 | Paint or erase | Drag on the globe with the selected brush |
 | Open example templates | Click the template icon in the top toolbar, then choose a world |
+| Manage local projects | Open the library icon in the top toolbar |
 | Rotate | Select the rotation tool, then drag |
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
 | Zoom | Wheel over the canvas, pinch with two fingers, or use the zoom buttons |

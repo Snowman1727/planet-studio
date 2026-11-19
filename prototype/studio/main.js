@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -7,9 +7,10 @@ import { BRUSHES } from './catalog.js';
 import { t, loadLocale, saveLocale, errorMessage, localizedError } from './i18n.js';
 import { bindNavigation } from './navigation.js';
 import { createTemplate } from './templates.js';
+import { bindLibrary } from './library-ui.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -29,6 +30,7 @@ try {
 const store = createStore(initial);
 let scene;
 let navigation;
+let libraryUI;
 let mode = 'tree';
 let previewing = false;
 let paused = false;
@@ -95,6 +97,7 @@ function renderLanguage() {
   updateEmbed();
   renderExportStatus();
   renderBookmarkDialog();
+  if ($('library-dialog').open) libraryUI?.render();
 }
 function renderBookmarkDialog() {
   const bookmarks = store.project.bookmarks;
@@ -231,6 +234,34 @@ navigation = bindNavigation(canvas, {
   resetLabel: (percent) => t(locale, 'resetZoomValue', { percent }),
 });
 refresh({ fields: true });
+libraryUI = bindLibrary({
+  storage: preferenceStorage,
+  getLocale: () => locale,
+  getProject: () => {
+    cancelStroke();
+    scene?.brush(null);
+    if (previewing) { scene?.freeze(); setPreview(false); }
+    if (scene) store.project.view = scene.view();
+    return structuredClone(store.project);
+  },
+  onOpen: (next, id) => requestReplace(next, id),
+  onSaved: (project) => {
+    store.project.name = project.name;
+    $('project-name').value = project.name;
+    savedJSON = text();
+    persist();
+  },
+  onRename: (name, originalName) => {
+    if (store.project.name !== originalName) return store.project.name;
+    const wasSaved = !hasUnsaved();
+    store.project.name = name;
+    $('project-name').value = name;
+    if (wasSaved) savedJSON = text();
+    persist();
+    return name;
+  },
+  announce,
+});
 if (recovered) { setSaveState('localDraft'); if (!failed) announce('recovered'); }
 else if (!storageAvailable && !failed) announce('recoveryUnavailable', true);
 $('language-setting').addEventListener('change', () => {
@@ -456,11 +487,14 @@ function saveJSON() {
   announce('jsonExported');
 }
 $('save-project').addEventListener('click', saveJSON);
-function replaceProject(next) {
+function replaceProject(next, libraryId = null) {
+  if (libraryId && !libraryUI.validateOpen(next, libraryId)) return;
   navigation.reset();
   cancelStroke();
   if (previewing) setPreview(false);
   store.replace(next);
+  libraryUI.setActive(libraryId);
+  savedJSON = libraryId ? text() : '';
   scene?.setView(store.project.view);
   refresh({ fields: true });
   bookmarkFeedback = null;
@@ -468,12 +502,12 @@ function replaceProject(next) {
   persist();
   announce('planetLoaded');
 }
-function requestReplace(next) {
+function requestReplace(next, libraryId = null) {
   cancelStroke();
   if (hasUnsaved()) {
-    pending = next;
+    pending = { project: next, libraryId };
     $('replace-dialog').showModal();
-  } else replaceProject(next);
+  } else replaceProject(next, libraryId);
 }
 $('new-project').addEventListener('click', () => {
   const seed = crypto.getRandomValues(new Uint32Array(1))[0];
@@ -494,7 +528,7 @@ $('templates-dialog').addEventListener('click', (event) => {
   requestReplace(next);
 });
 $('confirm-replace').addEventListener('click', () => {
-  if (pending) replaceProject(pending);
+  if (pending) replaceProject(pending.project, pending.libraryId);
   pending = null;
   $('replace-dialog').close();
 });

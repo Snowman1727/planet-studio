@@ -157,6 +157,18 @@ dialog::backdrop { background: #0009; }
 .template-option strong { font-size: 12px; font-weight: 500; }
 .template-option small { font-size: 10px; line-height: 1.4; color: var(--muted); }
 .template-option > svg { width: 16px; height: 16px; color: var(--muted); }
+.library-save-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.library-list { list-style: none; margin: 0; padding: 0; max-height: min(400px, 42svh); overflow-y: auto; }
+.library-list li { display: flex; align-items: center; gap: 6px; min-width: 0; border-top: 1px solid var(--line); }
+.library-open { min-width: 0; flex: 1; text-align: left; justify-content: space-between; padding: 12px 4px; gap: 8px; }
+.library-project-info { display: grid; gap: 4px; min-width: 0; }
+.library-project-info strong { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.library-project-info small, .library-project-info time { font-size: 10px; color: var(--muted); line-height: 1.5; }
+.library-project-info .library-current { color: var(--accent); }
+.library-open > svg { width: 15px; color: var(--muted); }
+.library-row-actions { display: flex; flex-shrink: 0; }
+.library-row-actions svg { width: 16px; height: 16px; }
+#delete-library-detail { overflow-wrap: anywhere; }
 .bookmark-form .field-label { margin-bottom: 8px; }
 .bookmark-entry { display: flex; gap: 8px; }
 .bookmark-entry .text-input { min-width: 0; flex: 1; }
@@ -194,20 +206,25 @@ body[data-preview="true"] .scene-label .status-dot { background: var(--coral); }
   #project-name { width: 140px; }
   .toolpanel { width: 200px; padding: 18px 12px; gap: 20px; }
 }
+@media (min-width: 681px) and (max-width: 840px) {
+  .topbar { height: 96px; flex-wrap: wrap; padding-block: 8px; gap: 4px 12px; }
+  .top-actions { flex-basis: 100%; justify-content: flex-end; }
+}
 @media (max-width: 680px) {
   body { min-height: 430px; }
-  .topbar { height: 96px; flex-wrap: wrap; gap: 0 10px; padding: 10px 12px 8px; align-content: space-between; }
+  .topbar { min-height: 96px; height: auto; flex-wrap: wrap; gap: 6px 10px; padding: 10px 12px 8px; align-content: space-between; }
   .studio-brand { font-size: 13px; }
   .studio-brand > svg { width: 20px; height: 20px; }
   .project-heading { flex: 1; justify-content: flex-end; }
   #project-name { width: 130px; font-size: 11px; text-align: right; }
   .top-divider { display: none; }
-  .top-actions { width: 100%; margin: 0; justify-content: flex-end; gap: 4px; }
-  #open-export { width: 32px; padding: 5px; }
+  .top-actions { width: 100%; margin: 0; justify-content: flex-end; flex-wrap: wrap; gap: 4px; }
+  #open-export { width: 30px; padding: 5px; }
   #open-export > span { display: none; }
-  #language-setting { width: 77px; height: 30px; }
-  .history-actions { margin-right: auto; padding-right: 8px; }
-  .top-actions .icon-button { width: 32px; height: 30px; }
+  #language-setting { width: 70px; height: 34px; }
+  .top-actions { gap: 2px; }
+  .history-actions { margin-right: auto; padding-right: 4px; }
+  .top-actions .icon-button { width: 30px; height: 34px; }
   .template-option { gap: 9px; }
   .template-option img { width: 76px; }
   .primary-button, .secondary-button { min-height: 30px; padding: 5px 10px; }
@@ -242,6 +259,10 @@ body[data-preview="true"] .scene-label .status-dot { background: var(--coral); }
   dialog { padding: 18px; }
   .bookmark-entry { flex-wrap: wrap; }
   .bookmark-entry .primary-button { width: 100%; justify-content: center; }
+  .library-list li { flex-wrap: wrap; padding-block: 4px; }
+  .library-open { flex-basis: 100%; }
+  .library-row-actions { margin-left: auto; }
+  .library-row-actions .icon-button { width: 40px; height: 40px; }
 }
 @media (max-height: 650px) and (min-width: 681px) {
   .toolpanel { gap: 12px; padding-top: 12px; padding-bottom: 12px; }
