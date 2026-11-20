@@ -150,6 +150,7 @@ function renderError(error) {
   document.querySelectorAll('button[data-mode]').forEach((button) => { button.disabled = true; });
   $('preview').disabled = true;
   $('open-bookmarks').disabled = true;
+  $('erase-type').disabled = true;
   renderBookmarkDialog();
   navigation?.reset();
   navigation?.render();
@@ -280,6 +281,8 @@ function setMode(value) {
   stage.dataset.mode = mode;
   document.querySelectorAll('button[data-mode]').forEach((button) => { button.setAttribute('aria-pressed', String(button.dataset.mode === mode)); });
   $('brush-density').disabled = mode === 'erase' || mode === 'rotate';
+  $('density-label').hidden = $('brush-density').hidden = mode === 'erase';
+  $('erase-options').hidden = mode !== 'erase';
   $('brush-radius').disabled = mode === 'rotate';
   scene?.brush(null);
 }
@@ -290,6 +293,7 @@ $('brush-radius').addEventListener('input', () => {
   scene?.brush(null);
 });
 $('brush-density').addEventListener('input', () => { cancelStroke(); $('density-value').value = `${$('brush-density').value}%`; });
+$('erase-type').addEventListener('change', () => { cancelStroke(); scene?.brush(null); });
 document.querySelectorAll('[name="environment"]').forEach((input) => {
   input.addEventListener('change', () => {
     if (!input.checked) return;
@@ -324,7 +328,7 @@ canvas.addEventListener('pointerdown', (event) => {
   canvas.setPointerCapture(event.pointerId);
   if (pointer.painting) {
     scene.freeze();
-    store.begin(mode, radius(), density());
+    store.begin(mode, radius(), density(), $('erase-type').value);
     const hit = scene.pick(event.clientX, event.clientY);
     store.sample(hit);
     scene.brush(hit, radius(), mode);
@@ -461,7 +465,7 @@ document.addEventListener('keydown', (event) => {
     cancelStroke();
     scene.freeze();
     const box = canvas.getBoundingClientRect();
-    store.begin(mode, radius(), density());
+    store.begin(mode, radius(), density(), $('erase-type').value);
     store.sample(scene.pick(box.x + box.width / 2, box.y + box.height / 2));
     store.commit();
     completeChange('strokeDone');

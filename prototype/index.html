@@ -51,8 +51,20 @@
         <legend data-i18n="brush">画笔</legend>
         <label class="range-label" for="brush-radius"><span data-i18n="radius">范围</span><output id="radius-value">16°</output></label>
         <input id="brush-radius" type="range" min="7" max="35" value="16">
-        <label class="range-label" for="brush-density"><span data-i18n="density">密度</span><output id="density-value">65%</output></label>
+        <label class="range-label" id="density-label" for="brush-density"><span data-i18n="density">密度</span><output id="density-value">65%</output></label>
         <input id="brush-density" type="range" min="10" max="100" value="65" step="5">
+        <div id="erase-options" hidden>
+          <label class="field-label" for="erase-type" data-i18n="eraseObjects">擦除对象</label>
+          <select class="text-input" id="erase-type">
+            <option value="all" data-i18n="allObjects">全部物件</option>
+            <option value="tree" data-i18n="pineTrees">松林</option>
+            <option value="house" data-i18n="house">木屋</option>
+            <option value="broadleaf" data-i18n="broadleaf">阔叶树</option>
+            <option value="flowers" data-i18n="flowers">花丛</option>
+            <option value="rock" data-i18n="rock">岩石</option>
+            <option value="mushroom" data-i18n="mushroom">蘑菇</option>
+          </select>
+        </div>
       </fieldset>
       <fieldset class="environment-options">
         <legend data-i18n="environment">环境</legend>

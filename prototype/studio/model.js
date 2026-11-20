@@ -159,7 +159,8 @@ export function createStore(initial) {
   function stamp(center) {
     if (stroke.type === 'erase') {
       const cos = Math.cos(stroke.radius);
-      project.objects = project.objects.filter((object) => dot(center, object.direction) < cos);
+      project.objects = project.objects.filter((object) =>
+        (stroke.eraseType !== 'all' && object.type !== stroke.eraseType) || dot(center, object.direction) < cos);
       rebuild();
       return;
     }
@@ -210,12 +211,13 @@ export function createStore(initial) {
       project.bookmarks.splice(index, 1);
       return true;
     },
-    begin(type, radius, density) {
-      if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1)) {
+    begin(type, radius, density, eraseType = 'all') {
+      if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1) ||
+          (type === 'erase' && (typeof eraseType !== 'string' || (eraseType !== 'all' && !Object.hasOwn(BRUSHES, eraseType))))) {
         throw localizedError('invalidBrush');
       }
       cancel();
-      stroke = { type, radius, density, before: clone(project), last: null, needed: radius / 4 };
+      stroke = { type, radius, density, eraseType, before: clone(project), last: null, needed: radius / 4 };
     },
     sample(direction) {
       if (!stroke) return;

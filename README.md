@@ -35,6 +35,7 @@ for a personal website, portfolio, or creative experiment.
 | **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
+| **Selective eraser** | Clear all objects in an area, or remove only pine trees, cabins, broadleaf trees, flowers, rocks or mushrooms. Other types stay untouched. |
 | **Local library** | Keep multiple planets in your browser. Open, rename, duplicate and delete saved projects, with confirmation before deletion. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
 | **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
@@ -44,7 +45,7 @@ for a personal website, portfolio, or creative experiment.
 
 1. **Start with a blank globe or template.** Open the template button in the toolbar to load a forest, village, or desert composition; replacing unsaved work asks for confirmation. You can also start blank and choose snow, grassland, or desert.
 2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
-3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. Switching environments preserves the arrangement.
+3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. With the eraser selected, choose **Erase objects** to target all objects or one type. Changing the target cancels an unfinished stroke; a completed stroke undoes as one action. The target is a temporary tool setting, not part of the project. Switching environments preserves the arrangement.
 4. **Save and share.** Save to the local library or download JSON to keep editing later. Export HTML when your planet is ready to display.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom
