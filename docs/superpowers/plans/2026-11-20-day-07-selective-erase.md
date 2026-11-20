@@ -56,12 +56,16 @@ the existing angular radius. No project fields or exported player changes.
   filter/mode/Escape/pointer cancellation, native keyboard select, real pixels,
   overflow/reachability, recovery, actual downloaded JSON roundtrip/library,
   schema 1 and downloaded offline HTML with blocked network.
-- [ ] Fresh read-only whole-feature review; fix important findings with
+- [x] Fresh read-only whole-feature review; fix important findings with
   failing regressions first. Commit only feature files with authorized author.
-- [ ] Fresh fetch, normal push main; wait successful Actions, exact SHA marker,
+- [x] Fresh fetch, normal push main; wait successful Actions, exact SHA marker,
   real online selective-eraser and WebGL checks.
-- [ ] Record actual Nov 20 publication in day-07 report/progress with evidence;
-  commit records and verify their deployment. Close only own QA processes.
+- [x] Record actual Nov 20 publication in day-07 report/progress with evidence.
+- [x] Prepare separate publication records and close only own QA processes.
+
+**Post-commit release gate:** Commit/push the records, wait for their Actions
+success and exact public marker. This gate runs after this document's commit;
+its verification does not require another self-referential documentation commit.
 
 ## Decisions
 
