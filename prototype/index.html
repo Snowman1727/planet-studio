@@ -43,11 +43,14 @@
         <button class="mode-button" data-mode="flowers" aria-label="花丛" data-i18n-label="flowers" aria-pressed="false"><span class="tool-symbol flowers-symbol"><i data-lucide="flower-2"></i></span><span data-i18n="flowers">花丛</span></button>
         <button class="mode-button" data-mode="rock" aria-label="岩石" data-i18n-label="rock" aria-pressed="false"><span class="tool-symbol rock-symbol"><i data-lucide="mountain"></i></span><span data-i18n="rock">岩石</span></button>
         <button class="mode-button" data-mode="mushroom" aria-label="蘑菇" data-i18n-label="mushroom" aria-pressed="false"><span class="tool-symbol mushroom-symbol"><i data-lucide="umbrella"></i></span><span data-i18n="mushroom">蘑菇</span></button>
-        <button class="mode-button" data-mode="erase" aria-label="橡皮" data-i18n-label="erase" aria-pressed="false"><span class="tool-symbol"><i data-lucide="eraser"></i></span><span data-i18n="erase">橡皮</span></button>
-        <button class="mode-button" data-mode="rotate" aria-label="旋转" data-i18n-label="rotate" aria-pressed="false"><span class="tool-symbol"><i data-lucide="rotate-3d"></i></span><span data-i18n="rotate">旋转</span></button>
+        </div>
+        <div class="utility-tools">
+          <button class="mode-button" data-mode="select" aria-label="选择" data-i18n-label="selectObject" title="选择" data-i18n-title="selectObject" aria-pressed="false"><i data-lucide="mouse-pointer-2"></i><span data-i18n="selectObject">选择</span></button>
+          <button class="mode-button" data-mode="erase" aria-label="橡皮" data-i18n-label="erase" title="橡皮" data-i18n-title="erase" aria-pressed="false"><i data-lucide="eraser"></i><span data-i18n="erase">橡皮</span></button>
+          <button class="mode-button" data-mode="rotate" aria-label="旋转" data-i18n-label="rotate" title="旋转" data-i18n-title="rotate" aria-pressed="false"><i data-lucide="rotate-3d"></i><span data-i18n="rotate">旋转</span></button>
         </div>
       </fieldset>
-      <fieldset class="brush-options">
+      <fieldset class="brush-options" id="brush-options">
         <legend data-i18n="brush">画笔</legend>
         <label class="range-label" for="brush-radius"><span data-i18n="radius">范围</span><output id="radius-value">16°</output></label>
         <input id="brush-radius" type="range" min="7" max="35" value="16">
@@ -66,6 +69,23 @@
           </select>
         </div>
       </fieldset>
+      <section class="object-inspector" id="object-inspector" aria-label="物件编辑" data-i18n-label="objectEditor" hidden>
+        <div class="selection-heading"><h2 id="selected-object">未选择物件</h2><button class="icon-button" type="button" id="clear-selection" aria-label="取消选择" title="取消选择" data-i18n-label="clearSelection" data-i18n-title="clearSelection"><i data-lucide="x"></i></button></div>
+        <form id="object-form">
+          <fieldset id="object-fields" disabled>
+            <div class="object-coordinate-fields">
+              <label><span data-i18n="latitude">纬度 (°)</span><input id="object-latitude" class="text-input" type="number" min="-90" max="90" step="any" required></label>
+              <label><span data-i18n="longitude">经度 (°)</span><input id="object-longitude" class="text-input" type="number" min="-180" max="180" step="any" required></label>
+              <label><span data-i18n="objectHeading">朝向 (°)</span><input id="object-heading" class="text-input" type="number" min="0" max="360" step="any" required></label>
+              <label><span data-i18n="objectScale">大小 (%)</span><input id="object-scale" class="text-input" type="number" min="75" max="120" step="any" required></label>
+            </div>
+            <div class="object-edit-actions">
+              <button class="secondary-button" type="submit" id="apply-object"><i data-lucide="check"></i><span data-i18n="applyObject">应用</span></button>
+              <button class="icon-button" type="button" id="delete-object" aria-label="删除物件" title="删除物件" data-i18n-label="deleteObject" data-i18n-title="deleteObject"><i data-lucide="trash-2"></i></button>
+            </div>
+          </fieldset>
+        </form>
+      </section>
       <fieldset class="environment-options">
         <legend data-i18n="environment">环境</legend>
         <div class="environment-switch">

@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -8,9 +8,11 @@ import { t, loadLocale, saveLocale, errorMessage, localizedError } from './i18n.
 import { bindNavigation } from './navigation.js';
 import { createTemplate } from './templates.js';
 import { bindLibrary } from './library-ui.js';
+import { bindObjectInspector } from './object-inspector.js';
+import { dragDirection } from './object-edit.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -31,6 +33,7 @@ const store = createStore(initial);
 let scene;
 let navigation;
 let libraryUI;
+let inspector;
 let mode = 'tree';
 let previewing = false;
 let paused = false;
@@ -98,6 +101,7 @@ function renderLanguage() {
   renderExportStatus();
   renderBookmarkDialog();
   if ($('library-dialog').open) libraryUI?.render();
+  inspector?.render();
 }
 function renderBookmarkDialog() {
   const bookmarks = store.project.bookmarks;
@@ -155,6 +159,7 @@ function renderError(error) {
   navigation?.reset();
   navigation?.render();
   renderExportStatus();
+  inspector?.render();
   announce('renderStatus', true);
 }
 function refresh({ fields = false } = {}) {
@@ -174,6 +179,7 @@ function refresh({ fields = false } = {}) {
   $('undo').disabled = !store.canUndo;
   $('redo').disabled = !store.canRedo;
   navigation?.render();
+  inspector?.render();
   if (fields) {
     $('project-name').value = doc.name;
     $('snow-setting').checked = doc.settings.snow;
@@ -225,7 +231,7 @@ navigation = bindNavigation(canvas, {
     persist();
   },
   onStart: () => {
-    const rotating = pointer && !pointer.painting;
+    const rotating = pointer?.kind === 'rotate';
     cancelStroke();
     if (rotating) store.project.view = scene.view();
     scene?.brush(null);
@@ -233,6 +239,14 @@ navigation = bindNavigation(canvas, {
   enabled: () => !failed,
   outButton: $('zoom-out'), inButton: $('zoom-in'), resetButton: $('zoom-reset'),
   resetLabel: (percent) => t(locale, 'resetZoomValue', { percent }),
+});
+inspector = bindObjectInspector({
+  store, getLocale: () => locale,
+  enabled: () => !failed && !previewing && mode === 'select',
+  onCancel: cancelStroke,
+  onSelection: (id) => scene?.select(mode === 'select' ? id : null),
+  onComplete: completeChange,
+  announce,
 });
 refresh({ fields: true });
 libraryUI = bindLibrary({
@@ -284,6 +298,10 @@ function setMode(value) {
   $('density-label').hidden = $('brush-density').hidden = mode === 'erase';
   $('erase-options').hidden = mode !== 'erase';
   $('brush-radius').disabled = mode === 'rotate';
+  $('brush-options').hidden = mode === 'select';
+  $('object-inspector').hidden = mode !== 'select';
+  if (mode !== 'select') inspector.select(null);
+  else inspector.render();
   scene?.brush(null);
 }
 document.querySelectorAll('button[data-mode]').forEach((button) => button.addEventListener('click', () => setMode(button.dataset.mode)));
@@ -310,12 +328,18 @@ $('project-name').addEventListener('input', () => { cancelStroke(); store.projec
 function endStroke(event) {
   if (!pointer || pointer.id !== event.pointerId) return;
   const wasPainting = pointer.painting;
+  const kind = pointer.kind;
+  const blocked = pointer.blocked;
   const beforeCount = pointer.beforeCount;
   pointer = null;
-  if (wasPainting) {
+  if (kind === 'edit') {
+    const changed = store.commit();
+    completeChange(changed ? 'objectUpdated' : 'noChange');
+    if (blocked) announce('objectOccupied', true);
+  } else if (wasPainting) {
     const changed = store.commit();
     completeChange(changed ? 'strokeDone' : mode === 'house' && beforeCount === store.project.objects.length ? 'noSpace' : 'noChange');
-  } else {
+  } else if (kind === 'rotate') {
     store.project.view = scene.view();
     persist();
   }
@@ -324,8 +348,21 @@ canvas.addEventListener('pointerdown', (event) => {
   if (failed || pointer || event.button !== 0) return;
   event.preventDefault();
   canvas.focus({ preventScroll: true });
-  pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, painting: !previewing && mode !== 'rotate', beforeCount: store.project.objects.length };
+  const kind = previewing || mode === 'rotate' ? 'rotate' : mode === 'select' ? 'select' : 'paint';
+  pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, kind, painting: kind === 'paint', beforeCount: store.project.objects.length };
   canvas.setPointerCapture(event.pointerId);
+  if (kind === 'select') {
+    scene.freeze();
+    const id = scene.pickObject(event.clientX, event.clientY);
+    inspector.select(id);
+    const object = store.project.objects.find((item) => item.id === id);
+    if (object && store.beginEdit(id)) {
+      pointer.kind = 'edit';
+      pointer.anchor = [...object.direction];
+      pointer.from = scene.pick(event.clientX, event.clientY) ?? [...object.direction];
+    }
+    return;
+  }
   if (pointer.painting) {
     scene.freeze();
     store.begin(mode, radius(), density(), $('erase-type').value);
@@ -338,13 +375,23 @@ canvas.addEventListener('pointerdown', (event) => {
 canvas.addEventListener('pointermove', (event) => {
   if (failed) return;
   if (pointer && event.pointerId !== pointer.id) return;
-  if (pointer && !pointer.painting) {
+  if (pointer?.kind === 'edit') {
+    if (Math.hypot(event.clientX - pointer.x, event.clientY - pointer.y) < 4 && !pointer.dragging) return;
+    pointer.dragging = true;
+    const hit = scene.pick(event.clientX, event.clientY);
+    if (!hit) return;
+    pointer.blocked = !store.edit({ direction: dragDirection(pointer.from, hit, pointer.anchor) });
+    refresh();
+    if (pointer.blocked) announce('objectOccupied', true);
+    return;
+  }
+  if (pointer?.kind === 'rotate') {
     scene.rotate((event.clientX - pointer.x) * 0.006, (event.clientY - pointer.y) * 0.004);
     pointer.x = event.clientX;
     pointer.y = event.clientY;
     return;
   }
-  if (previewing || mode === 'rotate') return;
+  if (previewing || mode === 'rotate' || mode === 'select') return;
   const hit = scene.pick(event.clientX, event.clientY);
   scene.brush(hit, radius(), mode);
   if (pointer?.painting) { store.sample(hit); refresh(); }
@@ -378,6 +425,7 @@ function setPreview(value) {
   $('preview-label').textContent = t(locale, value ? 'returnToEdit' : 'preview');
   $('scene-mode').textContent = t(locale, value ? 'previewing' : 'editing');
   $('pause-preview').hidden = !value || motion.matches;
+  inspector.render();
   if (!value && scene) { store.project.view = scene.view(); persist(); }
 }
 $('preview').addEventListener('click', () => setPreview(!previewing));
@@ -444,7 +492,7 @@ $('pause-preview').addEventListener('click', () => {
 const updatePlaybackControl = () => { $('pause-preview').hidden = !previewing || motion.matches; };
 motion.addEventListener('change', updatePlaybackControl);
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') { cancelStroke(); scene?.brush(null); return; }
+  if (event.key === 'Escape') { cancelStroke(); inspector.render(); scene?.brush(null); return; }
   if (document.querySelector('dialog[open]') || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName) || event.target.isContentEditable) return;
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
     event.preventDefault();
@@ -452,6 +500,11 @@ document.addEventListener('keydown', (event) => {
     return;
   }
   if (event.target !== canvas || failed) return;
+  if (mode === 'select' && !previewing && ['Delete', 'Backspace'].includes(event.key)) {
+    event.preventDefault();
+    inspector.remove();
+    return;
+  }
   const moves = { ArrowLeft: [-0.12, 0], ArrowRight: [0.12, 0], ArrowUp: [0, -0.1], ArrowDown: [0, 0.1] };
   if (moves[event.key]) {
     event.preventDefault();
@@ -465,6 +518,10 @@ document.addEventListener('keydown', (event) => {
     cancelStroke();
     scene.freeze();
     const box = canvas.getBoundingClientRect();
+    if (mode === 'select') {
+      inspector.select(scene.pickObject(box.x + box.width / 2, box.y + box.height / 2));
+      return;
+    }
     store.begin(mode, radius(), density(), $('erase-type').value);
     store.sample(scene.pick(box.x + box.width / 2, box.y + box.height / 2));
     store.commit();
@@ -497,6 +554,7 @@ function replaceProject(next, libraryId = null) {
   cancelStroke();
   if (previewing) setPreview(false);
   store.replace(next);
+  inspector.select(null);
   libraryUI.setActive(libraryId);
   savedJSON = libraryId ? text() : '';
   scene?.setView(store.project.view);

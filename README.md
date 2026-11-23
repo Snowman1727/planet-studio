@@ -36,6 +36,7 @@ for a personal website, portfolio, or creative experiment.
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
 | **Selective eraser** | Clear all objects in an area, or remove only pine trees, cabins, broadleaf trees, flowers, rocks or mushrooms. Other types stay untouched. |
+| **Individual object editing** | Select a decoration, drag it across the globe, or precisely edit its coordinates, heading and size. Safe spacing and one-action undo keep changes controlled. |
 | **Local library** | Keep multiple planets in your browser. Open, rename, duplicate and delete saved projects, with confirmation before deletion. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
 | **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
@@ -47,6 +48,17 @@ for a personal website, portfolio, or creative experiment.
 2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
 3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. With the eraser selected, choose **Erase objects** to target all objects or one type. Changing the target cancels an unfinished stroke; a completed stroke undoes as one action. The target is a temporary tool setting, not part of the project. Switching environments preserves the arrangement.
 4. **Save and share.** Save to the local library or download JSON to keep editing later. Export HTML when your planet is ready to display.
+
+Choose **Select** to click a decoration and drag it along the surface. A gold
+outline marks its footprint. The inline inspector offers latitude, longitude,
+heading and size (75–120%); **Apply** commits the fields together, while the
+trash button deletes the selection. Each drag, application or deletion is one
+undo step. Occupied destinations keep the last safe position, and dragging
+off the globe never lifts the object into space. Escape, navigation or a
+cancelled gesture restores an unfinished drag. Position, heading and size
+survive JSON, drafts, library saves and offline HTML; selection is editor-only.
+Unchanged fields preserve their full saved precision. Rotating or shrinking
+pre-existing overlapping objects does not require moving them first.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom
 tool panel to reach all brushes and environment settings.
@@ -131,11 +143,14 @@ your composition, saved view or undo history.
 | Manage local projects | Open the library icon in the top toolbar |
 | Rotate | Select the rotation tool, then drag |
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
+| Select / move a decoration | Select tool, then click / drag the decoration |
+| Keyboard object editing | In Select mode, Enter picks the object at the canvas center; Tab to the coordinate, heading and size fields, then Apply |
+| Delete selected decoration | Trash button, or Delete / Backspace while the canvas is focused in Select mode |
 | Zoom | Wheel over the canvas, pinch with two fingers, or use the zoom buttons |
 | Keyboard zoom / reset | + / - / 0 while the canvas is focused; click the percentage to reset |
 | Save and revisit views | Open the bookmark button beside Preview, name the current view, then select or delete it |
-| Stamp a brush | Enter while the canvas is focused |
-| Cancel the current stroke | Escape |
+| Stamp a brush | Enter while the canvas is focused in a brush mode |
+| Cancel the current stroke or object drag | Escape |
 | Undo | Cmd/Ctrl + Z |
 | Redo | Cmd/Ctrl + Shift + Z |
 
@@ -173,6 +188,8 @@ prototype/
     catalog.js         Brush footprints and environment palettes
     assets.js          Procedural decoration geometry
     model.js           Placement, validation, and stroke history
+    object-edit.js     Spherical dragging and geographic edit fields
+    object-inspector.js Single-object selection and numeric editing
     scene.js           Shared editor and player renderer
     main.js            Editor interaction and draft recovery
     player.js          Standalone viewer interaction

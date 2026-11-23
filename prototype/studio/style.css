@@ -68,6 +68,9 @@ h1, h2, p { margin: 0; }
 fieldset { padding: 0; border: 0; margin: 0; min-width: 0; }
 legend { padding: 0; margin-bottom: 10px; font-size: 11px; color: var(--muted); }
 .tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.utility-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding-top: 8px; margin-top: 8px; border-top: 1px solid var(--line); }
+.utility-tools .mode-button { flex-direction: column; justify-content: center; height: 48px; gap: 4px; font-size: 10px; }
+.utility-tools svg { width: 17px; height: 17px; }
 .mode-button { justify-content: flex-start; width: 100%; height: 40px; padding: 6px; gap: 6px; font-size: 12px; white-space: nowrap; }
 .mode-button[aria-pressed="true"] { background: oklch(0.29 0.03 175); border-color: oklch(0.44 0.05 175); color: var(--accent); }
 .mode-button[data-mode="erase"][aria-pressed="true"] { background: oklch(0.28 0.03 22); border-color: oklch(0.44 0.05 22); color: var(--coral); }
@@ -84,6 +87,15 @@ legend { padding: 0; margin-bottom: 10px; font-size: 11px; color: var(--muted); 
 .house-dot { background: var(--coral); }
 .brush-options { border-top: 1px solid var(--line); padding-top: 20px; }
 .brush-options legend { margin-bottom: 18px; }
+.object-inspector { border-top: 1px solid var(--line); padding-top: 12px; }
+.selection-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; min-width: 0; }
+.selection-heading h2 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 400; color: var(--muted); }
+.selection-heading .icon-button { width: 28px; height: 28px; }
+.object-coordinate-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 8px; }
+.object-coordinate-fields label { min-width: 0; font-size: 10px; color: var(--muted); }
+.object-coordinate-fields .text-input { display: block; min-width: 0; height: 34px; margin-top: 6px; padding: 5px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.object-edit-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: space-between; }
+#delete-object { color: var(--coral); }
 #erase-type { min-height: 36px; padding: 7px 9px; border-radius: 5px; }
 .range-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; font-size: 12px; }
 .range-label output { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
@@ -125,6 +137,8 @@ input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px;
 .zoom-controls .icon-button { width: 40px; height: 40px; }
 .zoom-value { width: 60px; height: 40px; padding: 0; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--muted); }
 #studio-canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+#stage[data-mode="select"] canvas { cursor: default; }
+#stage[data-mode="select"] canvas:active { cursor: grabbing; }
 #stage[data-mode="rotate"] canvas, #stage[data-preview="true"] canvas { cursor: grab; }
 #studio-canvas:active { cursor: crosshair; }
 #stage[data-mode="rotate"] canvas:active, #stage[data-preview="true"] canvas:active { cursor: grabbing; }
@@ -232,7 +246,13 @@ body[data-preview="true"] .scene-label .status-dot { background: var(--coral); }
   .workspace { flex-direction: column-reverse; }
   .toolpanel { width: 100%; height: min(280px, 44svh); flex-shrink: 0; border-right: 0; border-top: 1px solid var(--line); padding: 9px 12px 12px; display: block; overflow-y: auto; }
   .panel-heading, .composition, .tool-options legend, .brush-options legend { display: none; }
-  .tool-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+  .tool-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .utility-tools { padding-top: 5px; margin-top: 5px; }
+  .utility-tools .mode-button, :lang(en) .utility-tools .mode-button { flex-direction: row; height: 34px; gap: 6px; }
+  .object-inspector { margin-top: 10px; padding-top: 0; border: 0; }
+  .object-coordinate-fields { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .object-coordinate-fields .text-input { font-size: 10px; }
+  .selection-heading { margin-bottom: 6px; }
   .mode-button { height: 38px; justify-content: center; padding: 4px; gap: 6px; font-size: 11px; }
   .mode-button .tool-symbol { width: 21px; height: 21px; }
   .mode-button .tool-symbol svg { width: 20px; height: 20px; }

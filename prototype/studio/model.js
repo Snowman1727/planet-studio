@@ -108,7 +108,7 @@ class SpatialIndex {
     if (!this.cells.has(key)) this.cells.set(key, []);
     this.cells.get(key).push(object);
   }
-  fits(object) {
+  fits(object, ignoreId = null) {
     const [x, y, z] = this.coords(object.direction);
     const radius = footprint(object);
     const reach = Math.ceil((radius + maxFootprint) / 0.16);
@@ -116,6 +116,7 @@ class SpatialIndex {
       for (let b = y - reach; b <= y + reach; b++) {
         for (let c = z - reach; c <= z + reach; c++) {
           for (const other of this.cells.get(this.key(a, b, c)) ?? []) {
+            if (other.id === ignoreId) continue;
             if (dot(object.direction, other.direction) > Math.cos(radius + footprint(other))) return false;
           }
         }
@@ -128,7 +129,7 @@ class SpatialIndex {
 function unit(direction) {
   if (!Array.isArray(direction) || direction.length !== 3 || !direction.every(Number.isFinite)) return null;
   const length = Math.hypot(...direction);
-  return length > 0.00001 ? direction.map((n) => n / length) : null;
+  return Number.isFinite(length) && length > 0.00001 ? direction.map((n) => n / length) : null;
 }
 function interpolate(a, b, t) {
   const arc = angle(a, b);
@@ -185,13 +186,54 @@ export function createStore(initial) {
     return true;
   }
   function finishSegment() {
-    if (stroke?.last) stamp(stroke.last);
+    if (stroke?.type !== 'edit' && stroke?.last) stamp(stroke.last);
+  }
+  function beginEdit(id) {
+    if (!(stroke?.before ?? project).objects.some((object) => object.id === id)) return false;
+    cancel();
+    stroke = { type: 'edit', id, before: clone(project) };
+    return true;
+  }
+  function commit() {
+    if (!stroke) return false;
+    finishSegment();
+    const before = stroke.before;
+    stroke = null;
+    if (JSON.stringify(before.objects) === JSON.stringify(project.objects)) return false;
+    past.push(before);
+    if (past.length > HISTORY_LIMIT) past.shift();
+    future.length = 0;
+    return true;
   }
   return {
     get project() { return project; },
     get active() { return Boolean(stroke); },
     get canUndo() { return past.length > 0; },
     get canRedo() { return future.length > 0; },
+    beginEdit,
+    edit(patch) {
+      if (!stroke || stroke.type !== 'edit') return false;
+      if (!patch || Array.isArray(patch) || typeof patch !== 'object' ||
+          Object.keys(patch).some((key) => !['direction', 'scale', 'heading'].includes(key)) ||
+          (Object.hasOwn(patch, 'scale') && !bounded(patch.scale, 0.75, 1.2)) ||
+          (Object.hasOwn(patch, 'heading') && !bounded(patch.heading, 0, Math.PI * 2)) ||
+          (Object.hasOwn(patch, 'direction') && !unit(patch.direction))) throw localizedError('invalidObjectEdit');
+      const position = project.objects.findIndex((object) => object.id === stroke.id);
+      const previous = project.objects[position];
+      const next = { ...previous, ...patch };
+      if (Object.hasOwn(patch, 'direction')) next.direction = unit(patch.direction);
+      const moved = next.direction.some((n, i) => n !== previous.direction[i]);
+      if ((moved || next.scale > previous.scale) && !index.fits(next, previous.id)) return false;
+      project.objects[position] = next;
+      rebuild();
+      return true;
+    },
+    deleteObject(id) {
+      if (!beginEdit(id)) return false;
+      project.objects = project.objects.filter((object) => object.id !== id);
+      rebuild();
+      return commit();
+    },
     addBookmark(name, view) {
       if (typeof name !== 'string' || !name.trim() || name.trim().length > 40 || !validBookmarkView(view)) {
         throw localizedError('invalidBookmark');
@@ -220,7 +262,7 @@ export function createStore(initial) {
       stroke = { type, radius, density, eraseType, before: clone(project), last: null, needed: radius / 4 };
     },
     sample(direction) {
-      if (!stroke) return;
+      if (!stroke || stroke.type === 'edit') return;
       const next = unit(direction);
       if (!next) {
         finishSegment();
@@ -254,17 +296,7 @@ export function createStore(initial) {
       stroke.needed = Math.max(1e-8, stroke.needed - remaining);
       stroke.last = next;
     },
-    commit() {
-      if (!stroke) return false;
-      finishSegment();
-      const before = stroke.before;
-      stroke = null;
-      if (JSON.stringify(before.objects) === JSON.stringify(project.objects)) return false;
-      past.push(before);
-      if (past.length > HISTORY_LIMIT) past.shift();
-      future.length = 0;
-      return true;
-    },
+    commit,
     cancel,
     undo() {
       cancel();

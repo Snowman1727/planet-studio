@@ -107,6 +107,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   const objectTransform = new THREE.Object3D();
   const placed = new THREE.Matrix4();
   const matrix = new THREE.Matrix4();
+  let instanceIds = {};
   function syncObjects() {
     if (doc.objects.length > capacity) {
       capacity = Math.min(2000, Math.max(64, 2 ** Math.ceil(Math.log2(doc.objects.length || 1))));
@@ -119,6 +120,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       }
     }
     const counts = Object.fromEntries(Object.keys(BRUSHES).map((type) => [type, 0]));
+    instanceIds = Object.fromEntries(Object.keys(BRUSHES).map((type) => [type, []]));
     for (const object of doc.objects) {
       normal.fromArray(object.direction).normalize();
       objectTransform.position.copy(normal).multiplyScalar(height(normal) - 0.012);
@@ -128,6 +130,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       objectTransform.updateMatrix();
       placed.copy(objectTransform.matrix);
       const n = counts[object.type]++;
+      instanceIds[object.type].push(object.id);
       for (const p of parts) {
         if (p.type === object.type) p.mesh.setMatrixAt(n, matrix.multiplyMatrices(placed, p.local));
       }
@@ -176,9 +179,16 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
   const bitangent = new THREE.Vector3();
   const ringNormal = new THREE.Vector3();
   const point = new THREE.Vector3();
+  const selectionPoints = new Float32Array(97 * 3);
+  const selectionGeometry = new THREE.BufferGeometry();
+  selectionGeometry.setAttribute('position', new THREE.BufferAttribute(selectionPoints, 3));
+  const selection = new THREE.Line(selectionGeometry, new THREE.LineBasicMaterial({ color: 0xffd995, depthTest: true }));
+  selection.visible = false;
+  world.add(selection);
+  let selectedId = null;
 
-  function brush(direction, radius = 0.28, type = 'tree') {
-    ring.visible = Boolean(direction) && !presenting;
+  function surfaceRing(line, points, direction, radius) {
+    line.visible = Boolean(direction) && !presenting;
     if (direction) {
       ringNormal.fromArray(direction).normalize();
       tangent.crossVectors(Math.abs(ringNormal.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : UP, ringNormal).normalize();
@@ -189,13 +199,28 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
           .addScaledVector(tangent, Math.sin(radius) * Math.cos(phi))
           .addScaledVector(bitangent, Math.sin(radius) * Math.sin(phi)).normalize();
         point.multiplyScalar(height(point) + 0.014);
-        point.toArray(ringPoints, i * 3);
+        point.toArray(points, i * 3);
       }
-      ring.geometry.attributes.position.needsUpdate = true;
-      ring.geometry.computeBoundingSphere();
-      ring.material.color.setHex(type === 'erase' ? 0xf19590 : type === 'house' ? 0xffd995 : 0xa3f3d6);
+      line.geometry.attributes.position.needsUpdate = true;
+      line.geometry.computeBoundingSphere();
     }
     dirty = true;
+  }
+  function brush(direction, radius = 0.28, type = 'tree') {
+    surfaceRing(ring, ringPoints, direction, radius);
+    ring.material.color.setHex(type === 'erase' ? 0xf19590 : type === 'house' ? 0xffd995 : 0xa3f3d6);
+  }
+  function select(id) {
+    selectedId = id;
+    const object = doc.objects.find((item) => item.id === id);
+    surfaceRing(selection, selectionPoints, object?.direction, object ? BRUSHES[object.type].footprint * object.scale + 0.018 : 0);
+  }
+  function cast(clientX, clientY) {
+    const box = canvas.getBoundingClientRect();
+    pointer.set((clientX - box.left) / box.width * 2 - 1, -(clientY - box.top) / box.height * 2 + 1);
+    scene.updateMatrixWorld(true);
+    camera.updateMatrixWorld(true);
+    raycaster.setFromCamera(pointer, camera);
   }
   function resize() {
     if (disposed) return;
@@ -257,6 +282,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       if (changedEnvironment) applyEnvironment();
       if (changedSeed || changedEnvironment) buildTerrain();
       syncObjects();
+      select(selectedId);
     },
     setView(view) {
       target.x = view.x;
@@ -268,14 +294,19 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       dirty = true;
     },
     pick(clientX, clientY) {
-      const box = canvas.getBoundingClientRect();
-      pointer.set((clientX - box.left) / box.width * 2 - 1, -(clientY - box.top) / box.height * 2 + 1);
-      scene.updateMatrixWorld(true);
-      camera.updateMatrixWorld(true);
-      raycaster.setFromCamera(pointer, camera);
+      cast(clientX, clientY);
       const hit = raycaster.intersectObject(land, false)[0];
       return hit ? world.worldToLocal(hit.point).normalize().toArray() : null;
     },
+    pickObject(clientX, clientY) {
+      cast(clientX, clientY);
+      const meshes = parts.filter((part) => part.mesh?.visible && part.mesh.count > 0);
+      const hit = raycaster.intersectObjects([land, ...meshes.map((part) => part.mesh)], false)[0];
+      if (!hit || hit.object === land) return null;
+      const part = meshes.find((part) => part.mesh === hit.object);
+      return instanceIds[part.type][hit.instanceId] ?? null;
+    },
+    select,
     brush,
     freeze() {
       target.x = world.rotation.x;
@@ -318,9 +349,9 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
       if (!context) throw new Error('Image canvas unavailable');
       const dimensions = renderer.getSize(new THREE.Vector2());
       const pixelRatio = renderer.getPixelRatio();
-      const flags = [ring.visible, stars.visible, snow.visible];
+      const flags = [ring.visible, selection.visible, stars.visible, snow.visible];
       try {
-        ring.visible = stars.visible = snow.visible = false;
+        ring.visible = selection.visible = stars.visible = snow.visible = false;
         renderer.setPixelRatio(1);
         renderer.setSize(size, size, false);
         renderer.render(scene, imageCamera);
@@ -330,7 +361,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
         }
         context.drawImage(canvas, 0, 0);
       } finally {
-        [ring.visible, stars.visible, snow.visible] = flags;
+        [ring.visible, selection.visible, stars.visible, snow.visible] = flags;
         renderer.setPixelRatio(pixelRatio);
         renderer.setSize(dimensions.x, dimensions.y, false);
         renderer.render(scene, camera);
@@ -343,7 +374,7 @@ export function createScene(canvas, initial, { onError = () => {} } = {}) {
         }, 'image/png');
       });
     },
-    preview(value) { presenting = value; ring.visible = false; dirty = true; },
+    preview(value) { presenting = value; ring.visible = false; select(selectedId); dirty = true; },
     pause(value) { paused = value; dirty = true; },
     dispose() {
       disposed = true;
