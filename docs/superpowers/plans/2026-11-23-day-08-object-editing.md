@@ -68,9 +68,10 @@ using store plus callbacks for cancellation, completion and localized status.
   in both locales. Cover Review Focus plus actual JSON download/reimport,
   local recovery/library, legacy import, highlight-free PNG and downloaded
   HTML with network blocked; inspect screenshots and real WebGL pixels.
-- [ ] Obtain one fresh read-only whole-change review; important fixes require
+- [x] Obtain one fresh read-only whole-change review; important fixes require
   reproducing RED→GREEN tests and a green full suite.
-- [ ] Commit as `feat(editor): edit individual planet objects`, fresh fetch,
+- [x] Commit as `feat(editor): edit individual planet objects`, fresh fetch,
   normal push; verify Actions, exact public marker and online interactions.
-- [ ] Record Day 08 as published on the actual date, with feature SHA and
-  evidence; commit report/progress and verify the record deployment too.
+- [x] Record Day 08 as published on the actual date, with feature SHA and
+  evidence in report/progress. Commit these records, then verify their
+  deployment as the final operational check before the completion notice.

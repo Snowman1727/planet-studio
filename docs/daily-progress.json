@@ -75,7 +75,16 @@
       "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/44652646971",
       "report": "docs/daily-reports/day-07.md"
     },
-    { "day": 8, "scheduledDate": "2026-11-19", "feature": "单个物件编辑", "status": "pending" },
+    {
+      "day": 8,
+      "scheduledDate": "2026-11-19",
+      "feature": "单个物件编辑",
+      "status": "published",
+      "completedDate": "2026-11-23",
+      "commit": "eadbe8198b890ebca8832cd9d3302f08c5c8727b",
+      "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/45099872103",
+      "report": "docs/daily-reports/day-08.md"
+    },
     { "day": 9, "scheduledDate": "2026-11-20", "feature": "物件锁定", "status": "pending" },
     { "day": 10, "scheduledDate": "2026-11-21", "feature": "物件列表", "status": "pending" },
     { "day": 11, "scheduledDate": "2026-11-22", "feature": "混合生态画笔", "status": "pending" },
