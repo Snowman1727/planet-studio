@@ -60,9 +60,13 @@ export function parseProject(text) {
         !Array.isArray(object.direction) || object.direction.length !== 3 ||
         !object.direction.every((n) => bounded(n, -1, 1)) ||
         Math.abs(Math.hypot(...object.direction) - 1) > 0.0001 ||
-        !bounded(object.scale, 0.75, 1.2) || !bounded(object.heading, 0, Math.PI * 2)) fail();
+        !bounded(object.scale, 0.75, 1.2) || !bounded(object.heading, 0, Math.PI * 2) ||
+        (Object.hasOwn(object, 'locked') && typeof object.locked !== 'boolean')) fail();
     ids.add(object.id);
-    return { id: object.id, type: object.type, direction: [...object.direction], scale: object.scale, heading: object.heading };
+    return {
+      id: object.id, type: object.type, direction: [...object.direction], scale: object.scale, heading: object.heading,
+      ...(object.locked ? { locked: true } : {}),
+    };
   });
   return {
     version: 2, generator: 1, name: doc.name, seed: doc.seed,
@@ -161,7 +165,7 @@ export function createStore(initial) {
     if (stroke.type === 'erase') {
       const cos = Math.cos(stroke.radius);
       project.objects = project.objects.filter((object) =>
-        (stroke.eraseType !== 'all' && object.type !== stroke.eraseType) || dot(center, object.direction) < cos);
+        object.locked || (stroke.eraseType !== 'all' && object.type !== stroke.eraseType) || dot(center, object.direction) < cos);
       rebuild();
       return;
     }
@@ -188,12 +192,14 @@ export function createStore(initial) {
   function finishSegment() {
     if (stroke?.type !== 'edit' && stroke?.last) stamp(stroke.last);
   }
-  function beginEdit(id) {
-    if (!(stroke?.before ?? project).objects.some((object) => object.id === id)) return false;
+  function beginObjectEdit(id, allowLocked = false) {
+    const object = (stroke?.before ?? project).objects.find((object) => object.id === id);
+    if (!object || (object.locked && !allowLocked)) return false;
     cancel();
     stroke = { type: 'edit', id, before: clone(project) };
     return true;
   }
+  function beginEdit(id) { return beginObjectEdit(id); }
   function commit() {
     if (!stroke) return false;
     finishSegment();
@@ -211,6 +217,16 @@ export function createStore(initial) {
     get canUndo() { return past.length > 0; },
     get canRedo() { return future.length > 0; },
     beginEdit,
+    setObjectLocked(id, locked) {
+      if (typeof locked !== 'boolean') throw localizedError('invalidObjectLock');
+      const object = (stroke?.before ?? project).objects.find((object) => object.id === id);
+      if (!object || Boolean(object.locked) === locked) return false;
+      beginObjectEdit(id, true);
+      const target = project.objects.find((object) => object.id === id);
+      if (locked) target.locked = true;
+      else delete target.locked;
+      return commit();
+    },
     edit(patch) {
       if (!stroke || stroke.type !== 'edit') return false;
       if (!patch || Array.isArray(patch) || typeof patch !== 'object' ||
@@ -220,6 +236,7 @@ export function createStore(initial) {
           (Object.hasOwn(patch, 'direction') && !unit(patch.direction))) throw localizedError('invalidObjectEdit');
       const position = project.objects.findIndex((object) => object.id === stroke.id);
       const previous = project.objects[position];
+      if (!previous || previous.locked) return false;
       const next = { ...previous, ...patch };
       if (Object.hasOwn(patch, 'direction')) next.direction = unit(patch.direction);
       const moved = next.direction.some((n, i) => n !== previous.direction[i]);

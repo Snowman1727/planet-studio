@@ -11,7 +11,9 @@ export function bindObjectInspector({ store, getLocale, enabled, onCancel, onSel
     const object = current();
     if (!object) selected = null;
     const disabled = !object || !enabled();
-    $('object-fields').disabled = disabled;
+    $('object-fields').disabled = disabled || Boolean(object.locked);
+    $('object-locked').disabled = disabled;
+    $('object-locked').checked = Boolean(object?.locked);
     $('selected-object').textContent = object ? `${t(getLocale(), object.type)} · ${object.id}` : t(getLocale(), 'noObjectSelected');
     $('selected-object').title = object?.id ?? '';
     baseline = object ? poseFields(object) : null;
@@ -21,11 +23,11 @@ export function bindObjectInspector({ store, getLocale, enabled, onCancel, onSel
   function select(id) {
     selected = id;
     render();
-    if (selected) announce('objectSelected');
+    if (selected) announce(current()?.locked ? 'lockedObjectSelected' : 'objectSelected');
   }
   $('object-form').addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!enabled() || !current()) return;
+    if (!enabled() || !current() || current().locked) return;
     const id = selected;
     const values = Object.fromEntries(keys.map((key) => [key, $(`object-${key}`).value]));
     try {
@@ -44,8 +46,16 @@ export function bindObjectInspector({ store, getLocale, enabled, onCancel, onSel
       announce('invalidObjectEdit', true);
     }
   });
+  $('object-locked').addEventListener('change', () => {
+    if (!enabled() || !current()) { render(); return; }
+    const id = selected;
+    const locked = $('object-locked').checked;
+    onCancel();
+    const changed = store.setObjectLocked(id, locked);
+    onComplete(changed ? locked ? 'objectLocked' : 'objectUnlocked' : 'noChange');
+  });
   function remove() {
-    if (!enabled() || !current()) return;
+    if (!enabled() || !current() || current().locked) return;
     const id = selected;
     onCancel();
     if (store.deleteObject(id)) onComplete('objectDeleted');

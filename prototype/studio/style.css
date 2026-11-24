@@ -91,6 +91,9 @@ legend { padding: 0; margin-bottom: 10px; font-size: 11px; color: var(--muted); 
 .selection-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; min-width: 0; }
 .selection-heading h2 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 400; color: var(--muted); }
 .selection-heading .icon-button { width: 28px; height: 28px; }
+.object-lock { display: flex; align-items: center; gap: 8px; min-height: 36px; margin-bottom: 10px; font-size: 11px; color: var(--ink); }
+.object-lock svg { flex: 0 0 15px; width: 15px; height: 15px; color: var(--muted); }
+.object-lock span { flex: 1; }
 .object-coordinate-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 8px; }
 .object-coordinate-fields label { min-width: 0; font-size: 10px; color: var(--muted); }
 .object-coordinate-fields .text-input { display: block; min-width: 0; height: 34px; margin-top: 6px; padding: 5px; font-size: 11px; font-variant-numeric: tabular-nums; }

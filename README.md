@@ -37,6 +37,7 @@ for a personal website, portfolio, or creative experiment.
 | **Editable projects** | Undo or redo complete strokes, erase regions, recover a local draft, and save or import JSON projects. |
 | **Selective eraser** | Clear all objects in an area, or remove only pine trees, cabins, broadleaf trees, flowers, rocks or mushrooms. Other types stay untouched. |
 | **Individual object editing** | Select a decoration, drag it across the globe, or precisely edit its coordinates, heading and size. Safe spacing and one-action undo keep changes controlled. |
+| **Object locking** | Protect selected decorations from moving, resizing, deletion and erasing while continuing to paint around them. Locks travel with your project. |
 | **Local library** | Keep multiple planets in your browser. Open, rename, duplicate and delete saved projects, with confirmation before deletion. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
 | **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
@@ -59,6 +60,15 @@ cancelled gesture restores an unfinished drag. Position, heading and size
 survive JSON, drafts, library saves and offline HTML; selection is editor-only.
 Unchanged fields preserve their full saved precision. Rotating or shrinking
 pre-existing overlapping objects does not require moving them first.
+
+Check **Lock object** in the selection inspector to protect a decoration.
+Locked objects remain selectable, but their transform and delete controls are
+disabled; erasers skip them and brushes still respect their footprint.
+Uncheck to edit again. Each lock or unlock is one undo step; undo/redo intentionally
+restores earlier lock states. Locks persist through JSON, recovery, library saves
+and offline HTML. Older projects default to unlocked. Use the current editor to
+retain locks when re-saving; older editor builds may discard this optional field.
+Starting or opening another project still replaces the whole project.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom
 tool panel to reach all brushes and environment settings.

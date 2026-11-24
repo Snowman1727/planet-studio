@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -12,7 +12,7 @@ import { bindObjectInspector } from './object-inspector.js';
 import { dragDirection } from './object-edit.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
