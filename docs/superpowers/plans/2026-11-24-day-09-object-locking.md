@@ -67,8 +67,12 @@ Checkbox `#object-locked` owns the selected object's lock state.
   undo/redo, paint occupancy, preview, old JSON, recovery/library, downloaded
   JSON and actual file:// HTML with HTTP(S) blocked, screenshot/WebGL checks.
   Expected: all assertions green, no console/JS errors, no overflow.
-- [ ] Obtain one fresh read-only review. Fix important findings with RED→GREEN tests.
-- [ ] Commit `feat(editor): protect locked planet objects`, fresh fetch, normal
+- [x] Obtain one fresh read-only review. Fix important findings with RED→GREEN tests.
+- [x] Commit `feat(editor): protect locked planet objects`, fresh fetch, normal
   main push, wait Actions, exact release marker, real online browser verification.
-- [ ] Only then record Day 09 published on 2026-11-24 with feature SHA, report and
-  evidence; commit records and verify their deployment before notifying.
+- [x] Only then record Day 09 published on 2026-11-24 with feature SHA, report and
+  evidence.
+
+Release evidence: `docs/daily-reports/day-09.md`. Commit these records and verify
+their deployment before notifying; that final revision is checked after this
+document is committed, without adding a self-referential release-record commit.
