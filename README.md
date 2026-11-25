@@ -38,6 +38,7 @@ for a personal website, portfolio, or creative experiment.
 | **Selective eraser** | Clear all objects in an area, or remove only pine trees, cabins, broadleaf trees, flowers, rocks or mushrooms. Other types stay untouched. |
 | **Individual object editing** | Select a decoration, drag it across the globe, or precisely edit its coordinates, heading and size. Safe spacing and one-action undo keep changes controlled. |
 | **Object locking** | Protect selected decorations from moving, resizing, deletion and erasing while continuing to paint around them. Locks travel with your project. |
+| **Object list** | Filter by type, search IDs and locate decorations on any side of the globe. Paginated results stay responsive with 2,000 objects. |
 | **Local library** | Keep multiple planets in your browser. Open, rename, duplicate and delete saved projects, with confirmation before deletion. |
 | **Live presentation** | Rotate your planet, preview its animation, and add snowfall in the snow environment. Motion respects reduced-motion preferences. |
 | **Saved views** | Name up to eight camera angles per planet and revisit them in the editor or standalone player. |
@@ -68,6 +69,13 @@ Uncheck to edit again. Each lock or unlock is one undo step; undo/redo intention
 restores earlier lock states. Locks persist through JSON, recovery, library saves
 and offline HTML. Older projects default to unlocked. Use the current editor to
 retain locks when re-saving; older editor builds may discard this optional field.
+
+Open **Object list** beside the saved-view button to filter by type and search
+part of an ID (case-insensitive). Select a row to bring that decoration forward
+and open its editing controls, including locked or previously hidden objects.
+Pages contain up to 24 entries. Search and selection are temporary; locating
+saves only the camera view, preserves zoom and never changes object history.
+Near the poles, the existing pitch limit can leave the anchor slightly off-center.
 Starting or opening another project still replaces the whole project.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom

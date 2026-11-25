@@ -116,6 +116,7 @@
         <div class="scene-label"><span class="status-dot"></span><span id="scene-mode">编辑中</span><span class="scene-divider">/</span><span id="environment-label">雪原</span></div>
         <div class="view-actions">
           <button class="icon-button" id="pause-preview" aria-label="暂停动画" title="暂停动画" hidden><i data-lucide="pause"></i></button>
+          <button class="icon-button" id="open-objects" aria-label="物件列表" title="物件列表" data-i18n-label="objectList" data-i18n-title="objectList"><i data-lucide="list-tree"></i></button>
           <button class="icon-button" id="open-bookmarks" aria-label="视角收藏" title="视角收藏" data-i18n-label="savedViews" data-i18n-title="savedViews"><i data-lucide="bookmark"></i></button>
           <button class="secondary-button" id="preview" aria-pressed="false"><i data-lucide="eye"></i><span id="preview-label">预览</span></button>
         </div>
@@ -133,6 +134,30 @@
   </main>
   <footer class="statusbar"><span class="status-message" id="status" role="status" aria-live="polite">已就绪</span><span id="history-note" data-i18n="history">撤销历史 40 步</span></footer>
   <input id="project-file" type="file" accept=".json,application/json" hidden>
+
+  <dialog id="objects-dialog" aria-labelledby="objects-title">
+    <div class="dialog-heading"><h2 id="objects-title" data-i18n="objectList">物件列表</h2><button class="icon-button" data-close="objects-dialog" aria-label="关闭物件列表" title="关闭物件列表" data-i18n-label="closeObjectList" data-i18n-title="closeObjectList"><i data-lucide="x"></i></button></div>
+    <div class="object-list-controls">
+      <label><span class="field-label" data-i18n="objectType">物件类型</span><select class="text-input" id="object-filter">
+        <option value="all" data-i18n="allObjects">全部物件</option>
+        <option value="tree" data-i18n="pineTrees">松林</option>
+        <option value="house" data-i18n="house">木屋</option>
+        <option value="broadleaf" data-i18n="broadleaf">阔叶树</option>
+        <option value="flowers" data-i18n="flowers">花丛</option>
+        <option value="rock" data-i18n="rock">岩石</option>
+        <option value="mushroom" data-i18n="mushroom">蘑菇</option>
+      </select></label>
+      <label><span class="field-label" data-i18n="searchObjectId">搜索 ID</span><input class="text-input" id="object-search" type="search" maxlength="64" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <p id="object-results" class="bookmark-summary" role="status" aria-live="polite"></p>
+    <p id="object-list-empty" class="bookmark-empty"></p>
+    <ul id="object-list" class="object-list" aria-label="物件列表" data-i18n-label="objectList"></ul>
+    <div class="object-pagination">
+      <button class="icon-button" id="object-previous" aria-label="上一页" title="上一页" data-i18n-label="previousPage" data-i18n-title="previousPage"><i data-lucide="chevron-left"></i></button>
+      <span id="object-page"></span>
+      <button class="icon-button" id="object-next" aria-label="下一页" title="下一页" data-i18n-label="nextPage" data-i18n-title="nextPage"><i data-lucide="chevron-right"></i></button>
+    </div>
+  </dialog>
 
   <dialog id="library-dialog" aria-labelledby="library-title">
     <div class="dialog-heading"><h2 id="library-title" data-i18n="library">本地作品库</h2><button class="icon-button" data-close="library-dialog" aria-label="关闭作品库" data-i18n-label="closeLibrary" data-i18n-title="closeLibrary" title="关闭作品库"><i data-lucide="x"></i></button></div>

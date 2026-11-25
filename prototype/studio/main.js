@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -10,9 +10,11 @@ import { createTemplate } from './templates.js';
 import { bindLibrary } from './library-ui.js';
 import { bindObjectInspector } from './object-inspector.js';
 import { dragDirection } from './object-edit.js';
+import { objectView } from './object-list.js';
+import { bindObjectList } from './object-list-ui.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -34,6 +36,7 @@ let scene;
 let navigation;
 let libraryUI;
 let inspector;
+let objectList;
 let mode = 'tree';
 let previewing = false;
 let paused = false;
@@ -102,6 +105,7 @@ function renderLanguage() {
   renderBookmarkDialog();
   if ($('library-dialog').open) libraryUI?.render();
   inspector?.render();
+  objectList?.render();
 }
 function renderBookmarkDialog() {
   const bookmarks = store.project.bookmarks;
@@ -160,6 +164,7 @@ function renderError(error) {
   navigation?.render();
   renderExportStatus();
   inspector?.render();
+  objectList?.render();
   announce('renderStatus', true);
 }
 function refresh({ fields = false } = {}) {
@@ -180,6 +185,7 @@ function refresh({ fields = false } = {}) {
   $('redo').disabled = !store.canRedo;
   navigation?.render();
   inspector?.render();
+  objectList?.render();
   if (fields) {
     $('project-name').value = doc.name;
     $('snow-setting').checked = doc.settings.snow;
@@ -247,6 +253,28 @@ inspector = bindObjectInspector({
   onSelection: (id) => scene?.select(mode === 'select' ? id : null),
   onComplete: completeChange,
   announce,
+});
+objectList = bindObjectList({
+  getObjects: () => store.project.objects, getLocale: () => locale,
+  getSelected: () => inspector.selected, enabled: () => !failed,
+  onOpen: () => {
+    cancelStroke();
+    scene?.brush(null);
+    if (previewing) { scene?.freeze(); setPreview(false); }
+  },
+  onSelect: (id) => {
+    const object = store.project.objects.find((item) => item.id === id);
+    if (!object || failed) return;
+    setMode('select');
+    scene.freeze();
+    const view = objectView(object.direction, scene.view().zoom);
+    scene.setView(view);
+    store.project.view = view;
+    inspector.select(id);
+    navigation.render();
+    persist();
+    canvas.focus({ preventScroll: true });
+  },
 });
 refresh({ fields: true });
 libraryUI = bindLibrary({
@@ -555,6 +583,7 @@ function replaceProject(next, libraryId = null) {
   if (previewing) setPreview(false);
   store.replace(next);
   inspector.select(null);
+  objectList.reset();
   libraryUI.setActive(libraryId);
   savedJSON = libraryId ? text() : '';
   scene?.setView(store.project.view);
