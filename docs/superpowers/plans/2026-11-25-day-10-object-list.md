@@ -72,8 +72,12 @@ to `inspector.select(id)`; stale IDs never select a different object.
   hostile long IDs, preview, render failure, actual JSON, recovery/library,
   downloaded network-blocked file:// HTML, screenshots and WebGL pixels.
   Expected: all assertions pass, bounded DOM, no overflow or console errors.
-- [ ] Obtain one independent read-only review; fix important findings with TDD.
-- [ ] Commit `feat(editor): browse and locate planet objects`, fresh fetch,
+- [x] Obtain one independent read-only review; fix important findings with TDD.
+- [x] Commit `feat(editor): browse and locate planet objects`, fresh fetch,
   normal main push; verify Actions, exact live SHA and real online browser QA.
-- [ ] Record Day 10 published on 2026-11-25, evidence and report; commit records
-  and verify their deployment before notifying. Do not start Day 11.
+- [x] Only then record Day 10 published on 2026-11-25 with feature SHA,
+  evidence and report. Do not start Day 11.
+
+Release evidence: `docs/daily-reports/day-10.md`. Commit these records and verify
+their deployment before notifying; that final revision is checked after this
+document is committed, without adding a self-referential release-record commit.
