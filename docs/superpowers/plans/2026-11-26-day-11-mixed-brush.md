@@ -42,6 +42,6 @@ The user delegates daily technical choices without repeated approval. Use a shar
 - [x] Implement model, native controls, bilingual states and README; same tests pass, solo placement unaffected.
 - [x] Run full `npm test`, `npm run build`, `git diff --check`; expect pass, existing chunk-size warning allowed.
 - [x] Run real production Chromium: pointer/touch/keyboard painting, ratios/zeros, deterministic replay, history/cancel, locks/spacing, typed erase, both locales at 1440x960/390x844/360x640/844x390, screenshots/WebGL, old JSON, JSON/recovery/library and actual downloaded network-blocked file:// HTML. Expect no errors/overflow and exact saved objects.
-- [ ] Obtain independent read-only whole-change review; address important findings with a failing regression test.
-- [ ] Commit feature, fresh fetch, normal main push, successful Actions, exact live SHA and real online QA.
-- [ ] Only then record Day 11 published on 2026-11-26, report/evidence, commit records and verify final deployment. Do not start Day 12.
+- [x] Obtain independent read-only whole-change review; address important findings with a failing regression test.
+- [x] Commit feature, fresh fetch, normal main push, successful Actions, exact live SHA and real online QA.
+- [x] Only then record Day 11 published on 2026-11-26 and report/evidence. Commit records and verify their final deployment as the post-commit release gate; do not add a self-referential report commit. Do not start Day 12.
