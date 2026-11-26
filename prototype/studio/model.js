@@ -1,5 +1,6 @@
 import { localizedError } from './i18n.js';
 import { MIN_ZOOM, MAX_ZOOM } from './view.js';
+import { mixShares } from './mixed-brush.js';
 
 export const MAX_OBJECTS = 2000;
 export const MAX_FILE_BYTES = 2 * 1024 * 1024;
@@ -85,16 +86,18 @@ function hash(value) {
 // Conservative angular bounds cover canopies/roof corners on the lowest land.
 const footprint = (object) => BRUSHES[object.type].footprint * object.scale;
 const maxFootprint = Math.max(...Object.values(BRUSHES).map((brush) => brush.footprint)) * 1.2;
-function candidates(seed, type) {
-  const count = BRUSHES[type].candidates;
+function candidates(seed, type, mix = null) {
+  const count = mix ? 16000 : BRUSHES[type].candidates;
   const phase = hash(seed + 73) * Math.PI * 2;
   return Array.from({ length: count }, (_, i) => {
     const y = 1 - 2 * (i + 0.5) / count;
     const r = Math.sqrt(1 - y * y);
     const phi = i * Math.PI * (3 - Math.sqrt(5)) + phase;
     const base = (seed ^ Math.imul(i + 1, 0x9e3779b1)) >>> 0;
+    const choice = mix ? hash(base + 53) : 0;
+    const selected = mix ? (choice < mix.tree ? 'tree' : choice < mix.tree + mix.flowers ? 'flowers' : 'rock') : type;
     return {
-      id: `${type}:${i}`, type, direction: [r * Math.cos(phi), y, r * Math.sin(phi)],
+      id: `${mix ? 'eco' : type}:${i}`, type: selected, direction: [r * Math.cos(phi), y, r * Math.sin(phi)],
       scale: 0.75 + hash(base + 17) * 0.45,
       heading: hash(base + 29) * Math.PI * 2,
       chance: hash(base + 41),
@@ -270,12 +273,14 @@ export function createStore(initial) {
       project.bookmarks.splice(index, 1);
       return true;
     },
-    begin(type, radius, density, eraseType = 'all') {
-      if ((type !== 'erase' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1) ||
+    begin(type, radius, density, eraseType = 'all', mix) {
+      if ((type !== 'erase' && type !== 'mixed' && !Object.hasOwn(BRUSHES, type)) || !bounded(radius, 0.04, 0.7) || !bounded(density, 0, 1) ||
           (type === 'erase' && (typeof eraseType !== 'string' || (eraseType !== 'all' && !Object.hasOwn(BRUSHES, eraseType))))) {
         throw localizedError('invalidBrush');
       }
+      const shares = type === 'mixed' ? mixShares(mix) : null;
       cancel();
+      if (shares) population.mixed = candidates(project.seed, 'mixed', shares);
       stroke = { type, radius, density, eraseType, before: clone(project), last: null, needed: radius / 4 };
     },
     sample(direction) {

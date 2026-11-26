@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -12,9 +12,10 @@ import { bindObjectInspector } from './object-inspector.js';
 import { dragDirection } from './object-edit.js';
 import { objectView } from './object-list.js';
 import { bindObjectList } from './object-list-ui.js';
+import { DEFAULT_MIX, mixShares } from './mixed-brush.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -55,6 +56,27 @@ let savedJSON = recovered ? '' : JSON.stringify(store.project);
 const urls = new Set();
 const radius = () => Number($('brush-radius').value) * Math.PI / 180;
 const density = () => Number($('brush-density').value) / 100;
+const mixWeights = () => Object.fromEntries(Object.keys(DEFAULT_MIX).map((type) => [type, Number($(`mix-${type}`).value)]));
+function renderMix() {
+  let shares;
+  try { shares = mixShares(mixWeights()); } catch { /* All-zero is an editable but unpaintable setting. */ }
+  for (const type of Object.keys(DEFAULT_MIX)) {
+    const value = shares ? `${Math.round(shares[type] * 100)}%` : '0%';
+    $(`mix-${type}-value`).value = value;
+    $(`mix-${type}`).setAttribute('aria-valuetext', value);
+    $(`mix-${type}`).disabled = failed;
+    $(`mix-${type}`).setAttribute('aria-invalid', String(!shares));
+  }
+  $('mix-error').hidden = Boolean(shares);
+  $('mix-error').textContent = shares ? '' : t(locale, 'invalidMix');
+  return Boolean(shares);
+}
+function canPaint() {
+  if (mode !== 'mixed' || renderMix()) return true;
+  announce('invalidMix', true);
+  scene?.brush(null);
+  return false;
+}
 const text = () => JSON.stringify(store.project);
 const hasUnsaved = () => text() !== savedJSON;
 function renderStatus() {
@@ -73,7 +95,7 @@ function setSaveState(key) {
 }
 function announceError(error, fallback) {
   // Store the key, so switching language also translates an existing error.
-  const key = ['invalidProject', 'fileTooLarge', 'invalidBrush', 'contextLost'].includes(error?.code) ? error.code : fallback;
+  const key = ['invalidProject', 'fileTooLarge', 'invalidBrush', 'invalidMix', 'contextLost'].includes(error?.code) ? error.code : fallback;
   announce(key, true);
 }
 function renderLanguage() {
@@ -106,6 +128,7 @@ function renderLanguage() {
   if ($('library-dialog').open) libraryUI?.render();
   inspector?.render();
   objectList?.render();
+  renderMix();
 }
 function renderBookmarkDialog() {
   const bookmarks = store.project.bookmarks;
@@ -159,6 +182,7 @@ function renderError(error) {
   $('preview').disabled = true;
   $('open-bookmarks').disabled = true;
   $('erase-type').disabled = true;
+  renderMix();
   renderBookmarkDialog();
   navigation?.reset();
   navigation?.render();
@@ -325,6 +349,7 @@ function setMode(value) {
   $('brush-density').disabled = mode === 'erase' || mode === 'rotate';
   $('density-label').hidden = $('brush-density').hidden = mode === 'erase';
   $('erase-options').hidden = mode !== 'erase';
+  $('mix-options').hidden = mode !== 'mixed';
   $('brush-radius').disabled = mode === 'rotate';
   $('brush-options').hidden = mode === 'select';
   $('object-inspector').hidden = mode !== 'select';
@@ -340,6 +365,13 @@ $('brush-radius').addEventListener('input', () => {
 });
 $('brush-density').addEventListener('input', () => { cancelStroke(); $('density-value').value = `${$('brush-density').value}%`; });
 $('erase-type').addEventListener('change', () => { cancelStroke(); scene?.brush(null); });
+for (const type of Object.keys(DEFAULT_MIX)) {
+  $(`mix-${type}`).addEventListener('input', () => {
+    cancelStroke();
+    scene?.brush(null);
+    renderMix();
+  });
+}
 document.querySelectorAll('[name="environment"]').forEach((input) => {
   input.addEventListener('change', () => {
     if (!input.checked) return;
@@ -377,6 +409,7 @@ canvas.addEventListener('pointerdown', (event) => {
   event.preventDefault();
   canvas.focus({ preventScroll: true });
   const kind = previewing || mode === 'rotate' ? 'rotate' : mode === 'select' ? 'select' : 'paint';
+  if (kind === 'paint' && !canPaint()) return;
   pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, kind, painting: kind === 'paint', beforeCount: store.project.objects.length };
   canvas.setPointerCapture(event.pointerId);
   if (kind === 'select') {
@@ -393,7 +426,7 @@ canvas.addEventListener('pointerdown', (event) => {
   }
   if (pointer.painting) {
     scene.freeze();
-    store.begin(mode, radius(), density(), $('erase-type').value);
+    store.begin(mode, radius(), density(), $('erase-type').value, mixWeights());
     const hit = scene.pick(event.clientX, event.clientY);
     store.sample(hit);
     scene.brush(hit, radius(), mode);
@@ -420,6 +453,7 @@ canvas.addEventListener('pointermove', (event) => {
     return;
   }
   if (previewing || mode === 'rotate' || mode === 'select') return;
+  if (mode === 'mixed' && !renderMix()) { scene.brush(null); return; }
   const hit = scene.pick(event.clientX, event.clientY);
   scene.brush(hit, radius(), mode);
   if (pointer?.painting) { store.sample(hit); refresh(); }
@@ -543,6 +577,7 @@ document.addEventListener('keydown', (event) => {
   }
   if (event.key === 'Enter' && !event.repeat && !previewing && mode !== 'rotate') {
     event.preventDefault();
+    if (!canPaint()) return;
     cancelStroke();
     scene.freeze();
     const box = canvas.getBoundingClientRect();
@@ -550,7 +585,7 @@ document.addEventListener('keydown', (event) => {
       inspector.select(scene.pickObject(box.x + box.width / 2, box.y + box.height / 2));
       return;
     }
-    store.begin(mode, radius(), density(), $('erase-type').value);
+    store.begin(mode, radius(), density(), $('erase-type').value, mixWeights());
     store.sample(scene.pick(box.x + box.width / 2, box.y + box.height / 2));
     store.commit();
     completeChange('strokeDone');

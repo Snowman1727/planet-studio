@@ -1,5 +1,11 @@
 const preferenceKey = 'planet-studio:locale';
 const messages = {
+  mixed: ['混合生态', 'Ecology'],
+  mixRatio: ['生态配比', 'Ecology mix'],
+  mixTree: ['松林配比', 'Pine weight'],
+  mixFlowers: ['花丛配比', 'Flower weight'],
+  mixRock: ['岩石配比', 'Rock weight'],
+  invalidMix: ['请至少为一种景物设置非零配比。', 'Give at least one decoration a nonzero weight.'],
   title: ['Planet Studio · 星球画室', 'Planet Studio · Planet Editor'],
   home: ['Planet Studio 首页', 'Planet Studio home'],
   language: ['界面语言', 'Interface language'],

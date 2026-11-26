@@ -43,6 +43,7 @@
         <button class="mode-button" data-mode="flowers" aria-label="花丛" data-i18n-label="flowers" aria-pressed="false"><span class="tool-symbol flowers-symbol"><i data-lucide="flower-2"></i></span><span data-i18n="flowers">花丛</span></button>
         <button class="mode-button" data-mode="rock" aria-label="岩石" data-i18n-label="rock" aria-pressed="false"><span class="tool-symbol rock-symbol"><i data-lucide="mountain"></i></span><span data-i18n="rock">岩石</span></button>
         <button class="mode-button" data-mode="mushroom" aria-label="蘑菇" data-i18n-label="mushroom" aria-pressed="false"><span class="tool-symbol mushroom-symbol"><i data-lucide="umbrella"></i></span><span data-i18n="mushroom">蘑菇</span></button>
+        <button class="mode-button mixed-button" data-mode="mixed" aria-label="混合生态" data-i18n-label="mixed" aria-pressed="false"><span class="tool-symbol forest-symbol"><i data-lucide="sprout"></i></span><span data-i18n="mixed">混合生态</span></button>
         </div>
         <div class="utility-tools">
           <button class="mode-button" data-mode="select" aria-label="选择" data-i18n-label="selectObject" title="选择" data-i18n-title="selectObject" aria-pressed="false"><i data-lucide="mouse-pointer-2"></i><span data-i18n="selectObject">选择</span></button>
@@ -56,6 +57,22 @@
         <input id="brush-radius" type="range" min="7" max="35" value="16">
         <label class="range-label" id="density-label" for="brush-density"><span data-i18n="density">密度</span><output id="density-value">65%</output></label>
         <input id="brush-density" type="range" min="10" max="100" value="65" step="5">
+        <fieldset id="mix-options" hidden>
+          <legend data-i18n="mixRatio">生态配比</legend>
+          <div class="mix-row">
+            <label class="range-label" for="mix-tree"><span data-i18n="pineTrees">松林</span><output id="mix-tree-value">60%</output></label>
+            <input id="mix-tree" type="range" min="0" max="100" step="1" value="60" aria-label="松林配比" data-i18n-label="mixTree" aria-describedby="mix-error">
+          </div>
+          <div class="mix-row">
+            <label class="range-label" for="mix-flowers"><span data-i18n="flowers">花丛</span><output id="mix-flowers-value">25%</output></label>
+            <input id="mix-flowers" type="range" min="0" max="100" step="1" value="25" aria-label="花丛配比" data-i18n-label="mixFlowers" aria-describedby="mix-error">
+          </div>
+          <div class="mix-row">
+            <label class="range-label" for="mix-rock"><span data-i18n="rock">岩石</span><output id="mix-rock-value">15%</output></label>
+            <input id="mix-rock" type="range" min="0" max="100" step="1" value="15" aria-label="岩石配比" data-i18n-label="mixRock" aria-describedby="mix-error">
+          </div>
+          <p id="mix-error" role="alert" hidden></p>
+        </fieldset>
         <div id="erase-options" hidden>
           <label class="field-label" for="erase-type" data-i18n="eraseObjects">擦除对象</label>
           <select class="text-input" id="erase-type">

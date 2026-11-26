@@ -31,6 +31,7 @@ for a personal website, portfolio, or creative experiment.
 | | What you can create |
 | --- | --- |
 | **Region brushes** | Paint pine forests, cabins, broadleaf trees, flower patches, rocks, and mushrooms. Adjust brush radius and density to shape each area. |
+| **Mixed ecology brush** | Paint pine trees, flowers and rocks together with adjustable relative weights, shared safe spacing and whole-stroke undo. |
 | **Example templates** | Start from a woodland garden, hillside village, or dune outpost. Every object remains editable. |
 | **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
@@ -49,6 +50,15 @@ for a personal website, portfolio, or creative experiment.
 1. **Start with a blank globe or template.** Open the template button in the toolbar to load a forest, village, or desert composition; replacing unsaved work asks for confirmation. You can also start blank and choose snow, grassland, or desert.
 2. **Paint the landscape.** Select a brush, adjust its radius and density, and drag across the surface. Use the rotation tool to reach another side.
 3. **Refine the composition.** Mix brushes, erase regions, and undo or redo strokes. With the eraser selected, choose **Erase objects** to target all objects or one type. Changing the target cancels an unfinished stroke; a completed stroke undoes as one action. The target is a temporary tool setting, not part of the project. Switching environments preserves the arrangement.
+
+Choose **Ecology** to plant pine trees, flowers and rocks in one stroke. The three
+sliders are relative weights (default 60:25:15), normalized to percentages. A zero
+weight excludes that type; at least one weight must be nonzero. Weights control
+candidate probabilities, not exact final counts: footprints and available space
+affect the result. The same seed, weights, density and stroke path reproduce the
+same layout. Changing a weight cancels an unfinished stroke. Weights last only
+for the current session and reset on reload; JSON and offline HTML retain the
+final objects, with no new file format or player requirement.
 4. **Save and share.** Save to the local library or download JSON to keep editing later. Export HTML when your planet is ready to display.
 
 Choose **Select** to click a decoration and drag it along the surface. A gold
