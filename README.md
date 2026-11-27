@@ -32,6 +32,7 @@ for a personal website, portfolio, or creative experiment.
 | --- | --- |
 | **Region brushes** | Paint pine forests, cabins, broadleaf trees, flower patches, rocks, and mushrooms. Adjust brush radius and density to shape each area. |
 | **Mixed ecology brush** | Paint pine trees, flowers and rocks together with adjustable relative weights, shared safe spacing and whole-stroke undo. |
+| **Brush presets** | Save named brush configurations, reapply radius, density and mix weights, and rename or delete presets across sessions. |
 | **Example templates** | Start from a woodland garden, hillside village, or dune outpost. Every object remains editable. |
 | **Three environments** | Switch between snow, grassland, and desert. Terrain colors, vegetation, and lighting change without moving your objects. |
 | **Low-poly worlds** | Procedural geometry gives every planet a consistent miniature aesthetic, with snow caps in the snow environment. |
@@ -57,8 +58,8 @@ weight excludes that type; at least one weight must be nonzero. Weights control
 candidate probabilities, not exact final counts: footprints and available space
 affect the result. The same seed, weights, density and stroke path reproduce the
 same layout. Changing a weight cancels an unfinished stroke. Weights last only
-for the current session and reset on reload; JSON and offline HTML retain the
-final objects, with no new file format or player requirement.
+for the current session and reset on reload unless saved as a brush preset;
+JSON and offline HTML retain the final objects, with no new file format or player requirement.
 4. **Save and share.** Save to the local library or download JSON to keep editing later. Export HTML when your planet is ready to display.
 
 Choose **Select** to click a decoration and drag it along the surface. A gold
@@ -90,6 +91,26 @@ Starting or opening another project still replaces the whole project.
 
 The editor adapts to desktop and mobile screens. On phones, scroll the bottom
 tool panel to reach all brushes and environment settings.
+
+### Reuse a Brush
+
+Open **Brush presets** below the tool grid to save the current painting brush,
+radius, density and all three raw mix weights under a unique name. Apply a row
+to restore its controls; rename or delete it with the adjacent buttons. Deleting
+requires confirmation. Opening the manager cancels unfinished work and exits
+preview; applying changes only the brush, not completed objects or undo history.
+Select, erase and rotate tools can manage/apply presets but cannot save new ones.
+
+Keep up to **24 presets**, each with a **1–40 character** case-insensitively
+unique name. Radius is 7–35 degrees, density 10–100% in 5-point steps, and at
+least one mix weight must be nonzero. The collection is limited to 64 KiB.
+Presets belong to this browser and site, separate from drafts and the local
+project library. They are not included in JSON or HTML and do not sync across
+devices; clearing site data removes them. Completed painted objects still
+export normally. Writes require Web Locks over HTTPS or localhost. Invalid,
+full, unavailable or concurrently changed storage produces an explicit error
+without overwriting existing entries. When 3D rendering fails, existing
+presets can still be renamed or deleted, but cannot be saved or applied.
 
 ## Get Started
 
@@ -169,6 +190,7 @@ your composition, saved view or undo history.
 | Paint or erase | Drag on the globe with the selected brush |
 | Open example templates | Click the template icon in the top toolbar, then choose a world |
 | Manage local projects | Open the library icon in the top toolbar |
+| Save / apply brush presets | Open Brush presets below the tool grid |
 | Rotate | Select the rotation tool, then drag |
 | Rotate with the keyboard | Arrow keys while the canvas is focused |
 | Select / move a decoration | Select tool, then click / drag the decoration |

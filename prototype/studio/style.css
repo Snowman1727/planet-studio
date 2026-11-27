@@ -186,6 +186,11 @@ dialog::backdrop { background: #0009; }
 .template-option small { font-size: 10px; line-height: 1.4; color: var(--muted); }
 .template-option > svg { width: 16px; height: 16px; color: var(--muted); }
 .library-save-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.preset-opener { width: 100%; min-height: 36px; margin-top: 8px; gap: 8px; }
+.preset-opener svg { width: 16px; height: 16px; }
+.preset-current { font-size: 11px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; overflow-wrap: anywhere; }
+.presets-list .library-project-info small { overflow-wrap: anywhere; }
+#delete-preset-detail { overflow-wrap: anywhere; }
 .object-list-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 12px; }
 .object-list-controls label { min-width: 0; }
 .object-list-controls input, .object-list-controls select { height: 40px; min-width: 0; border-radius: 5px; }

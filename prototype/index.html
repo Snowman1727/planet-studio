@@ -50,6 +50,7 @@
           <button class="mode-button" data-mode="erase" aria-label="橡皮" data-i18n-label="erase" title="橡皮" data-i18n-title="erase" aria-pressed="false"><i data-lucide="eraser"></i><span data-i18n="erase">橡皮</span></button>
           <button class="mode-button" data-mode="rotate" aria-label="旋转" data-i18n-label="rotate" title="旋转" data-i18n-title="rotate" aria-pressed="false"><i data-lucide="rotate-3d"></i><span data-i18n="rotate">旋转</span></button>
         </div>
+        <button class="secondary-button preset-opener" id="open-presets" aria-haspopup="dialog"><i data-lucide="sliders-horizontal"></i><span data-i18n="brushPresets">画笔预设</span></button>
       </fieldset>
       <fieldset class="brush-options" id="brush-options">
         <legend data-i18n="brush">画笔</legend>
@@ -174,6 +175,34 @@
       <span id="object-page"></span>
       <button class="icon-button" id="object-next" aria-label="下一页" title="下一页" data-i18n-label="nextPage" data-i18n-title="nextPage"><i data-lucide="chevron-right"></i></button>
     </div>
+  </dialog>
+
+  <dialog id="presets-dialog" aria-labelledby="presets-title">
+    <div class="dialog-heading"><h2 id="presets-title" data-i18n="brushPresets">画笔预设</h2><button class="icon-button" data-close="presets-dialog" aria-label="关闭画笔预设" title="关闭画笔预设" data-i18n-label="closePresets" data-i18n-title="closePresets"><i data-lucide="x"></i></button></div>
+    <p id="preset-current" class="preset-current"></p>
+    <form id="presets-form" class="bookmark-form">
+      <label class="field-label" for="preset-name" data-i18n="presetName">预设名称</label>
+      <div class="bookmark-entry"><input class="text-input" id="preset-name" maxlength="40" required autocomplete="off"><button class="primary-button" type="submit" id="save-preset"><i data-lucide="save"></i><span data-i18n="savePreset">保存预设</span></button></div>
+    </form>
+    <p id="presets-feedback" class="export-status" role="status" aria-live="polite"></p>
+    <div class="bookmark-summary" id="presets-count"></div>
+    <p id="presets-empty" class="bookmark-empty" data-i18n="presetsEmpty">还没有画笔预设。</p>
+    <ul id="presets-list" class="library-list presets-list" aria-label="画笔预设" data-i18n-label="brushPresets"></ul>
+  </dialog>
+  <dialog id="rename-preset-dialog" aria-labelledby="rename-preset-title">
+    <div class="dialog-heading"><h2 id="rename-preset-title" data-i18n="renamePresetTitle">重命名预设</h2><button class="icon-button" data-close="rename-preset-dialog" aria-label="取消" data-i18n-label="cancel"><i data-lucide="x"></i></button></div>
+    <form id="rename-preset-form">
+      <label class="field-label" for="rename-preset-name" data-i18n="presetName">预设名称</label>
+      <input class="text-input" id="rename-preset-name" maxlength="40" required autocomplete="off">
+      <p id="rename-preset-feedback" class="export-status" data-error="true" role="alert"></p>
+      <div class="dialog-actions"><button class="secondary-button" type="button" data-close="rename-preset-dialog" data-i18n="cancel">取消</button><button class="primary-button" type="submit"><i data-lucide="pencil"></i><span data-i18n="confirmRename">重命名</span></button></div>
+    </form>
+  </dialog>
+  <dialog id="delete-preset-dialog" aria-labelledby="delete-preset-title">
+    <div class="dialog-heading"><h2 id="delete-preset-title" data-i18n="deletePresetTitle">删除预设？</h2><button class="icon-button" data-close="delete-preset-dialog" aria-label="取消" data-i18n-label="cancel"><i data-lucide="x"></i></button></div>
+    <p class="dialog-description" id="delete-preset-detail"></p>
+    <p id="delete-preset-feedback" class="export-status" data-error="true" role="alert"></p>
+    <div class="dialog-actions"><button class="secondary-button" id="cancel-preset-delete" data-close="delete-preset-dialog" data-i18n="cancel">取消</button><button class="danger-button" id="confirm-preset-delete"><i data-lucide="trash-2"></i><span data-i18n="confirmDelete">删除</span></button></div>
   </dialog>
 
   <dialog id="library-dialog" aria-labelledby="library-title">

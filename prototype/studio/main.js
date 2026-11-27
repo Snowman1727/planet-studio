@@ -1,4 +1,4 @@
-import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout } from 'lucide';
+import { createIcons, Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout, SlidersHorizontal } from 'lucide';
 import playerRuntime from 'virtual:planet-player';
 import { createProject, createStore, parseProject, MAX_OBJECTS, MAX_FILE_BYTES, BOOKMARK_LIMIT } from './model.js';
 import { createScene } from './scene.js';
@@ -13,9 +13,11 @@ import { dragDirection } from './object-edit.js';
 import { objectView } from './object-list.js';
 import { bindObjectList } from './object-list-ui.js';
 import { DEFAULT_MIX, mixShares } from './mixed-brush.js';
+import { bindBrushPresets } from './brush-presets-ui.js';
+import { validateBrushSettings } from './brush-presets.js';
 import './style.css';
 
-createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout } });
+createIcons({ icons: { Orbit, Undo2, Redo2, FilePlus2, FolderOpen, Save, Download, Trees, House, Eraser, Rotate3d, TreeDeciduous, Flower2, Mountain, Umbrella, TreePine, Eye, Pause, Play, X, FileCode2, Copy, ZoomIn, ZoomOut, Bookmark, BookmarkPlus, Trash2, LayoutTemplate, ArrowUpRight, Library, CopyPlus, Pencil, MousePointer2, Check, LockKeyhole, ListTree, ChevronLeft, ChevronRight, Sprout, SlidersHorizontal } });
 const $ = (id) => document.getElementById(id);
 const canvas = $('studio-canvas');
 const stage = $('stage');
@@ -38,6 +40,7 @@ let navigation;
 let libraryUI;
 let inspector;
 let objectList;
+let presetsUI;
 let mode = 'tree';
 let previewing = false;
 let paused = false;
@@ -126,6 +129,7 @@ function renderLanguage() {
   renderExportStatus();
   renderBookmarkDialog();
   if ($('library-dialog').open) libraryUI?.render();
+  if ($('presets-dialog').open) presetsUI?.render();
   inspector?.render();
   objectList?.render();
   renderMix();
@@ -190,6 +194,7 @@ function renderError(error) {
   inspector?.render();
   objectList?.render();
   announce('renderStatus', true);
+  if ($('presets-dialog').open) presetsUI?.render();
 }
 function refresh({ fields = false } = {}) {
   const doc = store.project;
@@ -301,6 +306,31 @@ objectList = bindObjectList({
   },
 });
 refresh({ fields: true });
+presetsUI = bindBrushPresets({
+  storage: preferenceStorage, getLocale: () => locale,
+  getSettings: () => validateBrushSettings({ mode, radius: Number($('brush-radius').value), density: Number($('brush-density').value), mix: mixWeights() }),
+  canSave: () => !failed && (mode === 'mixed' || Object.hasOwn(BRUSHES, mode)),
+  canApply: () => !failed,
+  onOpen: () => {
+    cancelStroke();
+    scene?.brush(null);
+    if (previewing) { scene?.freeze(); setPreview(false); }
+  },
+  onApply: (settings) => {
+    const next = validateBrushSettings(settings);
+    if (failed) throw localizedError('presetRenderFailed');
+    setMode(next.mode);
+    $('brush-radius').value = String(next.radius);
+    $('brush-density').value = String(next.density);
+    $('radius-value').value = `${next.radius}°`;
+    $('density-value').value = `${next.density}%`;
+    for (const type of Object.keys(DEFAULT_MIX)) $(`mix-${type}`).value = String(next.mix[type]);
+    renderMix();
+    scene?.brush(null);
+    canvas.focus({ preventScroll: true });
+  },
+  announce,
+});
 libraryUI = bindLibrary({
   storage: preferenceStorage,
   getLocale: () => locale,
