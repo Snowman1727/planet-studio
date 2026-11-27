@@ -115,7 +115,16 @@
       "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/45739853855",
       "report": "docs/daily-reports/day-11.md"
     },
-    { "day": 12, "scheduledDate": "2026-11-23", "feature": "画笔预设", "status": "pending" },
+    {
+      "day": 12,
+      "scheduledDate": "2026-11-23",
+      "feature": "画笔预设",
+      "status": "published",
+      "completedDate": "2026-11-27",
+      "commit": "44592064baa945c395de36402bbf6c195b6ff7d9",
+      "workflowUrl": "https://github.com/Snowman1727/planet-studio/actions/runs/45921755901",
+      "report": "docs/daily-reports/day-12.md"
+    },
     { "day": 13, "scheduledDate": "2026-11-24", "feature": "直线排列画笔", "status": "pending" },
     { "day": 14, "scheduledDate": "2026-11-25", "feature": "环形排列画笔", "status": "pending" },
     { "day": 15, "scheduledDate": "2026-11-26", "feature": "自定义配色", "status": "pending" },

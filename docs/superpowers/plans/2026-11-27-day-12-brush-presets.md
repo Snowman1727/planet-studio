@@ -41,6 +41,6 @@ The user explicitly delegates daily technical choices. Project-embedded presets 
 - [x] Implement storage, complete native dialog workflows, main integration and bilingual docs; focused tests pass.
 - [x] Run `npm test`, `npm run build`, `git diff --check`; expected all pass, existing bundle warning only.
 - [x] Real production Chromium: save/name/rename/apply/delete confirm/cancel, reload, native keyboard/touch, all modes and invalid configurations, cross-tab failures, unfinished stroke cancellation/history, both locales at 1440x960/390x844/360x640/844x390, screenshot/WebGL, old JSON/recovery/library and downloaded network-blocked offline HTML. Expected exact objects, no errors or overflow.
-- [ ] Independent read-only whole-change review; fix important findings with RED/GREEN tests.
-- [ ] Commit, fresh fetch, normal main push, successful Actions and exact feature SHA; repeat real online feature verification.
+- [x] Independent read-only whole-change review; fix important findings with RED/GREEN tests.
+- [x] Commit, fresh fetch, normal main push, successful Actions and exact feature SHA; repeat real online feature verification.
 - [ ] Only then record Day12 published and evidence, commit records and verify final deployment. Do not start Day13.
